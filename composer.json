@@ -1,0 +1,23 @@
+{
+  "name": "kpurrmann/finapi-sdk",
+  "description": "",
+  "license": "unlicense",
+  "version": "1.0.0",
+  "type": "library",
+  "require": {
+    "php": "^7.3 || ^8.0",
+    "ext-curl": "*",
+    "ext-json": "*",
+    "ext-mbstring": "*",
+    "guzzlehttp/guzzle": "^7.3",
+    "guzzlehttp/psr7": "^1.7 || ^2.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "OpenAPIGiroIdent\\Client\\" : "src/giroident",
+      "OpenAPIWebform\\Client\\" : "src/webform",
+      "OpenAPIDataIntelligence\\Client\\" : "src/data-intelligence",
+      "OpenAPIAccess\\Client\\" : "src/access"
+    }
+  }
+}
