@@ -59,7 +59,7 @@ class BankConnectionInterface implements ModelInterface, ArrayAccess, \JsonSeria
       * @var string[]
       */
     protected static $openAPITypes = [
-        'interface' => 'BankingInterface',
+        'interface' => '\OpenAPIAccess\Client\Model\BankingInterface',
         'login_credentials' => '\OpenAPIAccess\Client\Model\LoginCredentialResource[]',
         'default_two_step_procedure_id' => 'string',
         'two_step_procedures' => '\OpenAPIAccess\Client\Model\TwoStepProcedure[]',

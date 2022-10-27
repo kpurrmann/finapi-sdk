@@ -60,7 +60,7 @@ class SubmitStandingOrderParams implements ModelInterface, ArrayAccess, \JsonSer
       */
     protected static $openAPITypes = [
         'standing_order_id' => 'int',
-        'interface' => 'BankingInterface',
+        'interface' => '\OpenAPIAccess\Client\Model\BankingInterface',
         'login_credentials' => '\OpenAPIAccess\Client\Model\LoginCredential[]',
         'redirect_url' => 'string',
         'multi_step_authentication' => '\OpenAPIAccess\Client\Model\ConnectInterfaceParamsMultiStepAuthentication'

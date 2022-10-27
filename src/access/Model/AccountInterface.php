@@ -59,9 +59,9 @@ class AccountInterface implements ModelInterface, ArrayAccess, \JsonSerializable
       * @var string[]
       */
     protected static $openAPITypes = [
-        'interface' => 'BankingInterface',
-        'status' => 'AccountStatus',
-        'capabilities' => 'AccountCapability[]',
+        'interface' => '\OpenAPIAccess\Client\Model\BankingInterface',
+        'status' => '\OpenAPIAccess\Client\Model\AccountStatus',
+        'capabilities' => '\OpenAPIAccess\Client\Model\AccountCapability[]',
         'payment_capabilities' => '\OpenAPIAccess\Client\Model\AccountInterfacePaymentCapabilities',
         'last_successful_update' => 'string',
         'last_update_attempt' => 'string'

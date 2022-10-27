@@ -60,7 +60,7 @@ class RemoveInterfaceParams implements ModelInterface, ArrayAccess, \JsonSeriali
       */
     protected static $openAPITypes = [
         'bank_connection_id' => 'int',
-        'interface' => 'BankingInterface'
+        'interface' => '\OpenAPIAccess\Client\Model\BankingInterface'
     ];
 
     /**

@@ -60,7 +60,7 @@ class EditBankConnectionParams implements ModelInterface, ArrayAccess, \JsonSeri
       */
     protected static $openAPITypes = [
         'name' => 'string',
-        'interface' => 'BankingInterface',
+        'interface' => '\OpenAPIAccess\Client\Model\BankingInterface',
         'login_credentials' => '\OpenAPIAccess\Client\Model\LoginCredential[]',
         'default_two_step_procedure_id' => 'string'
     ];

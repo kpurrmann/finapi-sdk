@@ -62,7 +62,7 @@ class BankConnection implements ModelInterface, ArrayAccess, \JsonSerializable
         'id' => 'int',
         'name' => 'string',
         'update_status' => 'string',
-        'categorization_status' => 'CategorizationStatus',
+        'categorization_status' => '\OpenAPIAccess\Client\Model\CategorizationStatus',
         'interfaces' => '\OpenAPIAccess\Client\Model\BankConnectionInterface[]',
         'account_ids' => 'int[]',
         'owners' => '\OpenAPIAccess\Client\Model\BankConnectionOwner[]',
@@ -485,7 +485,7 @@ class BankConnection implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets categorization_status
      *
-     * @return CategorizationStatus
+     * @return \OpenAPIAccess\Client\Model\CategorizationStatus
      */
     public function getCategorizationStatus()
     {
@@ -495,7 +495,7 @@ class BankConnection implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets categorization_status
      *
-     * @param CategorizationStatus $categorization_status <strong>Type:</strong> CategorizationStatus<br/> Current status of transaction categorization. The asynchronous download process that is triggered by a call of the POST /bankConnections/import and POST /bankConnections/<id>/update services (and also by finAPI's auto update, if enabled) will set this flag to PENDING once the download has finished and a categorization is scheduled for the imported transactions. A separate categorization thread will then start to categorize the transactions (during this process, the status is IN_PROGRESS). When categorization has finished, the status will be (re-)set to READY. Note that the current categorization status should only be queried after the download has finished, i.e. once the download status has switched from IN_PROGRESS to READY.
+     * @param \OpenAPIAccess\Client\Model\CategorizationStatus $categorization_status <strong>Type:</strong> CategorizationStatus<br/> Current status of transaction categorization. The asynchronous download process that is triggered by a call of the POST /bankConnections/import and POST /bankConnections/<id>/update services (and also by finAPI's auto update, if enabled) will set this flag to PENDING once the download has finished and a categorization is scheduled for the imported transactions. A separate categorization thread will then start to categorize the transactions (during this process, the status is IN_PROGRESS). When categorization has finished, the status will be (re-)set to READY. Note that the current categorization status should only be queried after the download has finished, i.e. once the download status has switched from IN_PROGRESS to READY.
      *
      * @return self
      */

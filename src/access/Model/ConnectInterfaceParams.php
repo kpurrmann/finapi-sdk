@@ -60,13 +60,13 @@ class ConnectInterfaceParams implements ModelInterface, ArrayAccess, \JsonSerial
       */
     protected static $openAPITypes = [
         'bank_connection_id' => 'int',
-        'interface' => 'BankingInterface',
-        'source_interface' => 'BankingInterface',
+        'interface' => '\OpenAPIAccess\Client\Model\BankingInterface',
+        'source_interface' => '\OpenAPIAccess\Client\Model\BankingInterface',
         'login_credentials' => '\OpenAPIAccess\Client\Model\LoginCredential[]',
         'store_secrets' => 'bool',
         'skip_positions_download' => 'bool',
         'load_owner_data' => 'bool',
-        'account_types' => 'AccountType[]',
+        'account_types' => '\OpenAPIAccess\Client\Model\AccountType[]',
         'account_references' => '\OpenAPIAccess\Client\Model\AccountReference[]',
         'multi_step_authentication' => '\OpenAPIAccess\Client\Model\ConnectInterfaceParamsMultiStepAuthentication',
         'redirect_url' => 'string',

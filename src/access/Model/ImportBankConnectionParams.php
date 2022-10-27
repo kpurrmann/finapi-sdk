@@ -61,13 +61,13 @@ class ImportBankConnectionParams implements ModelInterface, ArrayAccess, \JsonSe
     protected static $openAPITypes = [
         'bank_id' => 'int',
         'name' => 'string',
-        'interface' => 'BankingInterface',
+        'interface' => '\OpenAPIAccess\Client\Model\BankingInterface',
         'login_credentials' => '\OpenAPIAccess\Client\Model\LoginCredential[]',
         'store_secrets' => 'bool',
         'skip_positions_download' => 'bool',
         'load_owner_data' => 'bool',
         'max_days_for_download' => 'int',
-        'account_types' => 'AccountType[]',
+        'account_types' => '\OpenAPIAccess\Client\Model\AccountType[]',
         'account_references' => '\OpenAPIAccess\Client\Model\AccountReference[]',
         'multi_step_authentication' => '\OpenAPIAccess\Client\Model\ConnectInterfaceParamsMultiStepAuthentication',
         'redirect_url' => 'string'

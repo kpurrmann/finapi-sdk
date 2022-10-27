@@ -68,7 +68,7 @@ class Account implements ModelInterface, ArrayAccess, \JsonSerializable
         'account_holder_name' => 'string',
         'account_holder_id' => 'string',
         'account_currency' => 'string',
-        'account_type' => 'AccountType',
+        'account_type' => '\OpenAPIAccess\Client\Model\AccountType',
         'balance' => 'float',
         'overdraft' => 'float',
         'overdraft_limit' => 'float',

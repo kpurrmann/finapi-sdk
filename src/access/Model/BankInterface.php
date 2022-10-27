@@ -59,17 +59,17 @@ class BankInterface implements ModelInterface, ArrayAccess, \JsonSerializable
       * @var string[]
       */
     protected static $openAPITypes = [
-        'interface' => 'BankingInterface',
+        'interface' => '\OpenAPIAccess\Client\Model\BankingInterface',
         'tpp_authentication_group' => '\OpenAPIAccess\Client\Model\BankInterfaceTppAuthenticationGroup',
         'login_credentials' => '\OpenAPIAccess\Client\Model\BankInterfaceLoginField[]',
-        'properties' => 'BankInterfaceProperty[]',
+        'properties' => '\OpenAPIAccess\Client\Model\BankInterfaceProperty[]',
         'login_hint' => 'string',
         'health' => 'int',
         'last_communication_attempt' => 'string',
         'last_successful_communication' => 'string',
         'is_ais_supported' => 'bool',
         'payment_capabilities' => '\OpenAPIAccess\Client\Model\BankInterfacePaymentCapabilities',
-        'ais_account_types' => 'AccountType[]'
+        'ais_account_types' => '\OpenAPIAccess\Client\Model\AccountType[]'
     ];
 
     /**

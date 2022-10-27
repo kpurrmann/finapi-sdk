@@ -60,7 +60,7 @@ class AccountParams implements ModelInterface, ArrayAccess, \JsonSerializable
       */
     protected static $openAPITypes = [
         'account_name' => 'string',
-        'account_type' => 'AccountType',
+        'account_type' => '\OpenAPIAccess\Client\Model\AccountType',
         'is_new' => 'bool'
     ];
 

@@ -60,7 +60,7 @@ class MockBankConnectionUpdate implements ModelInterface, ArrayAccess, \JsonSeri
       */
     protected static $openAPITypes = [
         'bank_connection_id' => 'int',
-        'interface' => 'BankingInterface',
+        'interface' => '\OpenAPIAccess\Client\Model\BankingInterface',
         'simulate_bank_login_error' => 'bool',
         'mock_accounts_data' => '\OpenAPIAccess\Client\Model\MockAccountData[]'
     ];

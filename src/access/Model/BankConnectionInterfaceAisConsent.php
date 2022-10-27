@@ -59,7 +59,7 @@ class BankConnectionInterfaceAisConsent implements ModelInterface, ArrayAccess, 
       * @var string[]
       */
     protected static $openAPITypes = [
-        'status' => 'BankConsentStatus',
+        'status' => '\OpenAPIAccess\Client\Model\BankConsentStatus',
         'expires_at' => 'string'
     ];
 
