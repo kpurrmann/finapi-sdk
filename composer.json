@@ -2,7 +2,7 @@
   "name": "kpurrmann/finapi-sdk",
   "description": "",
   "license": "unlicense",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "library",
   "require": {
     "php": "^7.3 || ^8.0",
