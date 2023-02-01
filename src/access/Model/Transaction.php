@@ -11,14 +11,14 @@
  */
 
 /**
- * finAPI Access
+ * finAPI Access V2
  *
- * <strong>RESTful API for Account Information Services (AIS) and Payment Initiation Services (PIS)</strong>  The following pages give you some general information on how to use our APIs.<br/> The actual API services documentation then follows further below. You can use the menu to jump between API sections. <br/> <br/> This page has a built-in HTTP(S) client, so you can test the services directly from within this page, by filling in the request parameters and/or body in the respective services, and then hitting the TRY button. Note that you need to be authorized to make a successful API call. To authorize, refer to the 'Authorization' section of the API, or just use the OAUTH button that can be found near the TRY button. <br/>  <h2 id=\"general-information\">General information</h2>  <h3 id=\"general-error-responses\"><strong>Error Responses</strong></h3> When an API call returns with an error, then in general it has the structure shown in the following example:  <pre> {   \"errors\": [     {       \"message\": \"Interface 'FINTS_SERVER' is not supported for this operation.\",       \"code\": \"BAD_REQUEST\",       \"type\": \"TECHNICAL\"     }   ],   \"date\": \"2020-11-19 16:54:06.854\",   \"requestId\": \"selfgen-312042e7-df55-47e4-bffd-956a68ef37b5\",   \"endpoint\": \"POST /api/v1/bankConnections/import\",   \"authContext\": \"1/21\",   \"bank\": \"DEMO0002 - finAPI Test Redirect Bank\" } </pre>  If an API call requires an additional authentication by the user, HTTP code 510 is returned and the error response contains the additional \"multiStepAuthentication\" object, see the following example:  <pre> {   \"errors\": [     {       \"message\": \"Es ist eine zusätzliche Authentifizierung erforderlich. Bitte geben Sie folgenden Code an: 123456\",       \"code\": \"ADDITIONAL_AUTHENTICATION_REQUIRED\",       \"type\": \"BUSINESS\",       \"multiStepAuthentication\": {         \"hash\": \"678b13f4be9ed7d981a840af8131223a\",         \"status\": \"CHALLENGE_RESPONSE_REQUIRED\",         \"challengeMessage\": \"Es ist eine zusätzliche Authentifizierung erforderlich. Bitte geben Sie folgenden Code an: 123456\",         \"answerFieldLabel\": \"TAN\",         \"redirectUrl\": null,         \"redirectContext\": null,         \"redirectContextField\": null,         \"twoStepProcedures\": null,         \"photoTanMimeType\": null,         \"photoTanData\": null,         \"opticalData\": null,         \"opticalDataAsReinerSct\": false       }     }   ],   \"date\": \"2019-11-29 09:51:55.931\",   \"requestId\": \"selfgen-45059c99-1b14-4df7-9bd3-9d5f126df294\",   \"endpoint\": \"POST /api/v1/bankConnections/import\",   \"authContext\": \"1/18\",   \"bank\": \"DEMO0001 - finAPI Test Bank\" } </pre>  An exception to this error format are API authentication errors, where the following structure is returned:  <pre> {   \"error\": \"invalid_token\",   \"error_description\": \"Invalid access token: cccbce46-xxxx-xxxx-xxxx-xxxxxxxxxx\" } </pre>  <h3 id=\"general-paging\"><strong>Paging</strong></h3> API services that may potentially return a lot of data implement paging. They return a limited number of entries within a \"page\". Further entries must be fetched with subsequent calls. <br/><br/> Any API service that implements paging provides the following input parameters:<br/> &bull; \"page\": the number of the page to be retrieved (starting with 1).<br/> &bull; \"perPage\": the number of entries within a page. The default and maximum value is stated in the documentation of the respective services.  A paged response contains an additional \"paging\" object with the following structure:  <pre> {   ...   ,   \"paging\": {     \"page\": 1,     \"perPage\": 20,     \"pageCount\": 234,     \"totalCount\": 4662   } } </pre>  <h3 id=\"general-internationalization\"><strong>Internationalization</strong></h3> The finAPI services support internationalization which means you can define the language you prefer for API service responses. <br/><br/> The following languages are available: German, English, Czech, Slovak. <br/><br/> The preferred language can be defined by providing the official HTTP <strong>Accept-Language</strong> header. <br/><br/> finAPI reacts on the official iso language codes &quot;de&quot;, &quot;en&quot;, &quot;cs&quot; and &quot;sk&quot; for the named languages. Additional subtags supported by the Accept-Language header may be provided, e.g. &quot;en-US&quot;, but are ignored. <br/> If no Accept-Language header is given, German is used as the default language. <br/><br/> Exceptions:<br/> &bull; Bank login hints and login fields are only available in the language of the bank and not being translated.<br/> &bull; Direct messages from the bank systems typically returned as BUSINESS errors will not be translated.<br/> &bull; BUSINESS errors created by finAPI directly are available in German and English.<br/> &bull; TECHNICAL errors messages meant for developers are mostly in English, but also may be translated.  <h3 id=\"general-request-ids\"><strong>Request IDs</strong></h3> With any API call, you can pass a request ID via a header with name \"X-Request-Id\". The request ID can be an arbitrary string with up to 255 characters. Passing a longer string will result in an error. <br/><br/> If you don't pass a request ID for a call, finAPI will generate a random ID internally. <br/><br/> The request ID is always returned back in the response of a service, as a header with name \"X-Request-Id\". <br/><br/> We highly recommend to always pass a (preferably unique) request ID, and include it into your client application logs whenever you make a request or receive a response (especially in the case of an error response). finAPI is also logging request IDs on its end. Having a request ID can help the finAPI support team to work more efficiently and solve tickets faster.  <h3 id=\"general-overriding-http-methods\"><strong>Overriding HTTP methods</strong></h3> Some HTTP clients do not support the HTTP methods PATCH or DELETE. If you are using such a client in your application, you can use a POST request instead with a special HTTP header indicating the originally intended HTTP method. <br/><br/> The header's name is <strong>X-HTTP-Method-Override</strong>. Set its value to either <strong>PATCH</strong> or <strong>DELETE</strong>. POST Requests having this header set will be treated either as PATCH or DELETE by the finAPI servers. <br/><br/> Example: <br/><br/> <strong>X-HTTP-Method-Override: PATCH</strong><br/> POST /api/v1/label/51<br/> {\"name\": \"changed label\"}<br/><br/> will be interpreted by finAPI as:<br/><br/> PATCH /api/v1/label/51<br/> {\"name\": \"changed label\"}<br/>  <h3 id=\"general-user-metadata\"><strong>User metadata</strong></h3> With the migration to PSD2 APIs, a new term called \"User metadata\" (also known as \"PSU metadata\") has been introduced to the API. This user metadata aims to inform the banking API if there was a real end-user behind an HTTP request or if the request was triggered by a system (e.g. by an automatic batch update). In the latter case, the bank may apply some restrictions such as limiting the number of HTTP requests for a single consent. Also, some operations may be forbidden entirely by the banking API. For example, some banks do not allow issuing a new consent without the end-user being involved. Therefore, it is certainly necessary and obligatory for the customer to provide the PSU metadata for such operations. <br/><br/> As finAPI does not have direct interaction with the end-user, it is the client application's responsibility to provide all the necessary information about the end-user. This must be done by sending additional headers with every request triggered on behalf of the end-user. <br/><br/> At the moment, the following headers are supported by the API:<br/> &bull; \"PSU-IP-Address\" - the IP address of the user's device.<br/> &bull; \"PSU-Device-OS\" - the user's device and/or operating system identification.<br/> &bull; \"PSU-User-Agent\" - the user's web browser or other client device identification.  <h3 id=\"general-faq\"><strong>FAQ</strong></h3> <strong>Is there a finAPI SDK?</strong> <br/> Currently we do not offer a native SDK, but there is the option to generate an SDK for almost any target language via OpenAPI. Use the 'Download SDK' button on this page for SDK generation. <br/> <br/> <strong>How can I enable finAPI's automatic batch update?</strong> <br/> Currently there is no way to set up the batch update via the API. Please contact support@finapi.io for this. <br/> <br/> <strong>Why do I need to keep authorizing when calling services on this page?</strong> <br/> This page is a \"one-page-app\". Reloading the page resets the OAuth authorization context. There is generally no need to reload the page, so just don't do it and your authorization will persist.
+ * <strong>RESTful API for Account Information Services (AIS) and Payment Initiation Services (PIS)</strong> <br/> <strong>Application Version:</strong> 2.6.2 <br/>  The following pages give you some general information on how to use our APIs.<br/> The actual API services documentation then follows further below. You can use the menu to jump between API sections. <br/> <br/> This page has a built-in HTTP(S) client, so you can test the services directly from within this page, by filling in the request parameters and/or body in the respective services, and then hitting the TRY button. Note that you need to be authorized to make a successful API call. To authorize, refer to the 'Authorization' section of the API, or just use the OAUTH button that can be found near the TRY button. <br/>  <h2 id=\"general-information\">General information</h2>  <h3 id=\"general-error-responses\"><strong>Error Responses</strong></h3> When an API call returns with an error, then in general it has the structure shown in the following example:  <pre> {   \"errors\": [     {       \"message\": \"Interface 'FINTS_SERVER' is not supported for this operation.\",       \"code\": \"BAD_REQUEST\",       \"type\": \"TECHNICAL\"     }   ],   \"date\": \"2020-11-19T16:54:06.854+01:00\",   \"requestId\": \"selfgen-312042e7-df55-47e4-bffd-956a68ef37b5\",   \"endpoint\": \"POST /api/v2/bankConnections/import\",   \"authContext\": \"1/21\",   \"bank\": \"DEMO0002 - finAPI Test Redirect Bank\" } </pre>  If an API call requires an additional authentication by the user, HTTP code 510 is returned and the error response contains the additional \"multiStepAuthentication\" object, see the following example:  <pre> {   \"errors\": [     {       \"message\": \"Es ist eine zusätzliche Authentifizierung erforderlich. Bitte geben Sie folgenden Code an: 123456\",       \"code\": \"ADDITIONAL_AUTHENTICATION_REQUIRED\",       \"type\": \"BUSINESS\",       \"multiStepAuthentication\": {         \"hash\": \"678b13f4be9ed7d981a840af8131223a\",         \"status\": \"CHALLENGE_RESPONSE_REQUIRED\",         \"challengeMessage\": \"Es ist eine zusätzliche Authentifizierung erforderlich. Bitte geben Sie folgenden Code an: 123456\",         \"answerFieldLabel\": \"TAN\",         \"redirectUrl\": null,         \"redirectContext\": null,         \"redirectContextField\": null,         \"twoStepProcedures\": null,         \"photoTanMimeType\": null,         \"photoTanData\": null,         \"opticalData\": null,         \"opticalDataAsReinerSct\": false       }     }   ],   \"date\": \"2019-11-29T09:51:55.931+01:00\",   \"requestId\": \"selfgen-45059c99-1b14-4df7-9bd3-9d5f126df294\",   \"endpoint\": \"POST /api/v2/bankConnections/import\",   \"authContext\": \"1/18\",   \"bank\": \"DEMO0001 - finAPI Test Bank\" } </pre>  An exception to this error format are API authentication errors, where the following structure is returned:  <pre> {   \"error\": \"invalid_token\",   \"error_description\": \"Invalid access token: cccbce46-xxxx-xxxx-xxxx-xxxxxxxxxx\" } </pre>  <h3 id=\"general-paging\"><strong>Paging</strong></h3> API services that may potentially return a lot of data implement paging. They return a limited number of entries within a \"page\". Further entries must be fetched with subsequent calls. <br/><br/> Any API service that implements paging provides the following input parameters:<br/> &bull; \"page\": the number of the page to be retrieved (starting with 1).<br/> &bull; \"perPage\": the number of entries within a page. The default and maximum value is stated in the documentation of the respective services.  A paged response contains an additional \"paging\" object with the following structure:  <pre> {   ...   ,   \"paging\": {     \"page\": 1,     \"perPage\": 20,     \"pageCount\": 234,     \"totalCount\": 4662   } } </pre>  <h3 id=\"general-internationalization\"><strong>Internationalization</strong></h3> The finAPI services support internationalization which means you can define the language you prefer for API service responses. <br/><br/> The following languages are available: German, English, Czech, Slovak. <br/><br/> The preferred language can be defined by providing the official HTTP <strong>Accept-Language</strong> header. <br/><br/> finAPI reacts on the official iso language codes &quot;de&quot;, &quot;en&quot;, &quot;cs&quot; and &quot;sk&quot; for the named languages. Additional subtags supported by the Accept-Language header may be provided, e.g. &quot;en-US&quot;, but are ignored. <br/> If no Accept-Language header is given, German is used as the default language. <br/><br/> Exceptions:<br/> &bull; Bank login hints and login fields are only available in the language of the bank and not being translated.<br/> &bull; Direct messages from the bank systems typically returned as BUSINESS errors will not be translated.<br/> &bull; BUSINESS errors created by finAPI directly are available in German and English.<br/> &bull; TECHNICAL errors messages meant for developers are mostly in English, but also may be translated.  <h3 id=\"general-request-ids\"><strong>Request IDs</strong></h3> With any API call, you can pass a request ID via a header with name \"X-Request-Id\". The request ID can be an arbitrary string with up to 255 characters. Passing a longer string will result in an error. <br/><br/> If you don't pass a request ID for a call, finAPI will generate a random ID internally. <br/><br/> The request ID is always returned back in the response of a service, as a header with name \"X-Request-Id\". <br/><br/> We highly recommend to always pass a (preferably unique) request ID, and include it into your client application logs whenever you make a request or receive a response (especially in the case of an error response). finAPI is also logging request IDs on its end. Having a request ID can help the finAPI support team to work more efficiently and solve tickets faster.  <h3 id=\"general-overriding-http-methods\"><strong>Overriding HTTP methods</strong></h3> Some HTTP clients do not support the HTTP methods PATCH or DELETE. If you are using such a client in your application, you can use a POST request instead with a special HTTP header indicating the originally intended HTTP method. <br/><br/> The header's name is <strong>X-HTTP-Method-Override</strong>. Set its value to either <strong>PATCH</strong> or <strong>DELETE</strong>. POST Requests having this header set will be treated either as PATCH or DELETE by the finAPI servers. <br/><br/> Example: <br/><br/> <strong>X-HTTP-Method-Override: PATCH</strong><br/> POST /api/v2/label/51<br/> {\"name\": \"changed label\"}<br/><br/> will be interpreted by finAPI as:<br/><br/> PATCH /api/v2/label/51<br/> {\"name\": \"changed label\"}<br/>  <h3 id=\"general-user-metadata\"><strong>User metadata</strong></h3> With the migration to PSD2 APIs, a new term called \"User metadata\" (also known as \"PSU metadata\") has been introduced to the API. This user metadata aims to inform the banking API if there was a real end-user behind an HTTP request or if the request was triggered by a system (e.g. by an automatic batch update). In the latter case, the bank may apply some restrictions such as limiting the number of HTTP requests for a single consent. Also, some operations may be forbidden entirely by the banking API. For example, some banks do not allow issuing a new consent without the end-user being involved. Therefore, it is certainly necessary and obligatory for the customer to provide the PSU metadata for such operations. <br/><br/> As finAPI does not have direct interaction with the end-user, it is the client application's responsibility to provide all the necessary information about the end-user. This must be done by sending additional headers with every request triggered on behalf of the end-user. <br/><br/> At the moment, the following headers are supported by the API:<br/> &bull; \"PSU-IP-Address\" - the IP address of the user's device.<br/> &bull; \"PSU-Device-OS\" - the user's device and/or operating system identification.<br/> &bull; \"PSU-User-Agent\" - the user's web browser or other client device identification.  <h3 id=\"general-faq\"><strong>FAQ</strong></h3> <strong>Is there a finAPI SDK?</strong> <br/> Currently we do not offer a native SDK, but there is the option to generate an SDK for almost any target language via OpenAPI. Use the 'Download SDK' button on this page for SDK generation. <br/> <br/> <strong>How can I enable finAPI's automatic batch update?</strong> <br/> Currently there is no way to set up the batch update via the API. Please contact support@finapi.io for this. <br/> <br/> <strong>Why do I need to keep authorizing when calling services on this page?</strong> <br/> This page is a \"one-page-app\". Reloading the page resets the OAuth authorization context. There is generally no need to reload the page, so just don't do it and your authorization will persist.
  *
- * The version of the OpenAPI document: 1.162.3
+ * The version of the OpenAPI document: 2023.03.3
  * Contact: kontakt@finapi.io
  * Generated by: https://openapi-generator.tech
- * OpenAPI Generator version: 6.2.0
+ * OpenAPI Generator version: 6.1.0
  */
 
 /**
@@ -62,9 +62,9 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
         'id' => 'int',
         'parent_id' => 'int',
         'account_id' => 'int',
-        'value_date' => 'string',
-        'bank_booking_date' => 'string',
-        'finapi_booking_date' => 'string',
+        'value_date' => '\DateTime',
+        'bank_booking_date' => '\DateTime',
+        'finapi_booking_date' => '\DateTime',
         'amount' => 'float',
         'currency' => 'Currency',
         'purpose' => 'string',
@@ -89,9 +89,9 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
         'is_potential_duplicate' => 'bool',
         'is_adjusting_entry' => 'bool',
         'is_new' => 'bool',
-        'import_date' => 'string',
+        'import_date' => '\DateTime',
         'children' => 'int[]',
-        'paypal_data' => '\OpenAPIAccess\Client\Model\TransactionPaypalData',
+        'paypal_data' => '\OpenAPIAccess\Client\Model\PendingTransactionPaypalData',
         'end_to_end_reference' => 'string',
         'compensation_amount' => 'float',
         'original_amount' => 'float',
@@ -111,9 +111,9 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
         'id' => 'int64',
         'parent_id' => 'int64',
         'account_id' => 'int64',
-        'value_date' => null,
-        'bank_booking_date' => null,
-        'finapi_booking_date' => null,
+        'value_date' => 'date',
+        'bank_booking_date' => 'date',
+        'finapi_booking_date' => 'date',
         'amount' => null,
         'currency' => null,
         'purpose' => null,
@@ -138,7 +138,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
         'is_potential_duplicate' => null,
         'is_adjusting_entry' => null,
         'is_new' => null,
-        'import_date' => null,
+        'import_date' => 'date-time',
         'children' => 'int64',
         'paypal_data' => null,
         'end_to_end_reference' => null,
@@ -156,44 +156,44 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
       */
     protected static array $openAPINullables = [
         'id' => false,
-		'parent_id' => true,
+		'parent_id' => false,
 		'account_id' => false,
 		'value_date' => false,
 		'bank_booking_date' => false,
 		'finapi_booking_date' => false,
 		'amount' => false,
-		'currency' => true,
-		'purpose' => true,
-		'counterpart_name' => true,
-		'counterpart_account_number' => true,
-		'counterpart_iban' => true,
-		'counterpart_blz' => true,
-		'counterpart_bic' => true,
-		'counterpart_bank_name' => true,
-		'counterpart_mandate_reference' => true,
-		'counterpart_customer_reference' => true,
-		'counterpart_creditor_id' => true,
-		'counterpart_debitor_id' => true,
-		'type' => true,
-		'type_code_zka' => true,
-		'type_code_swift' => true,
-		'sepa_purpose_code' => true,
-		'bank_transaction_code' => true,
-		'primanota' => true,
-		'category' => true,
+		'currency' => false,
+		'purpose' => false,
+		'counterpart_name' => false,
+		'counterpart_account_number' => false,
+		'counterpart_iban' => false,
+		'counterpart_blz' => false,
+		'counterpart_bic' => false,
+		'counterpart_bank_name' => false,
+		'counterpart_mandate_reference' => false,
+		'counterpart_customer_reference' => false,
+		'counterpart_creditor_id' => false,
+		'counterpart_debitor_id' => false,
+		'type' => false,
+		'type_code_zka' => false,
+		'type_code_swift' => false,
+		'sepa_purpose_code' => false,
+		'bank_transaction_code' => false,
+		'primanota' => false,
+		'category' => false,
 		'labels' => false,
 		'is_potential_duplicate' => false,
 		'is_adjusting_entry' => false,
 		'is_new' => false,
 		'import_date' => false,
-		'children' => true,
-		'paypal_data' => true,
-		'end_to_end_reference' => true,
-		'compensation_amount' => true,
-		'original_amount' => true,
-		'original_currency' => true,
-		'different_debitor' => true,
-		'different_creditor' => true
+		'children' => false,
+		'paypal_data' => false,
+		'end_to_end_reference' => false,
+		'compensation_amount' => false,
+		'original_amount' => false,
+		'original_currency' => false,
+		'different_debitor' => false,
+		'different_creditor' => false
     ];
 
     /**
@@ -535,9 +535,6 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
         if ($this->container['id'] === null) {
             $invalidProperties[] = "'id' can't be null";
         }
-        if ($this->container['parent_id'] === null) {
-            $invalidProperties[] = "'parent_id' can't be null";
-        }
         if ($this->container['account_id'] === null) {
             $invalidProperties[] = "'account_id' can't be null";
         }
@@ -553,63 +550,6 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
         if ($this->container['amount'] === null) {
             $invalidProperties[] = "'amount' can't be null";
         }
-        if ($this->container['currency'] === null) {
-            $invalidProperties[] = "'currency' can't be null";
-        }
-        if ($this->container['purpose'] === null) {
-            $invalidProperties[] = "'purpose' can't be null";
-        }
-        if ($this->container['counterpart_name'] === null) {
-            $invalidProperties[] = "'counterpart_name' can't be null";
-        }
-        if ($this->container['counterpart_account_number'] === null) {
-            $invalidProperties[] = "'counterpart_account_number' can't be null";
-        }
-        if ($this->container['counterpart_iban'] === null) {
-            $invalidProperties[] = "'counterpart_iban' can't be null";
-        }
-        if ($this->container['counterpart_blz'] === null) {
-            $invalidProperties[] = "'counterpart_blz' can't be null";
-        }
-        if ($this->container['counterpart_bic'] === null) {
-            $invalidProperties[] = "'counterpart_bic' can't be null";
-        }
-        if ($this->container['counterpart_bank_name'] === null) {
-            $invalidProperties[] = "'counterpart_bank_name' can't be null";
-        }
-        if ($this->container['counterpart_mandate_reference'] === null) {
-            $invalidProperties[] = "'counterpart_mandate_reference' can't be null";
-        }
-        if ($this->container['counterpart_customer_reference'] === null) {
-            $invalidProperties[] = "'counterpart_customer_reference' can't be null";
-        }
-        if ($this->container['counterpart_creditor_id'] === null) {
-            $invalidProperties[] = "'counterpart_creditor_id' can't be null";
-        }
-        if ($this->container['counterpart_debitor_id'] === null) {
-            $invalidProperties[] = "'counterpart_debitor_id' can't be null";
-        }
-        if ($this->container['type'] === null) {
-            $invalidProperties[] = "'type' can't be null";
-        }
-        if ($this->container['type_code_zka'] === null) {
-            $invalidProperties[] = "'type_code_zka' can't be null";
-        }
-        if ($this->container['type_code_swift'] === null) {
-            $invalidProperties[] = "'type_code_swift' can't be null";
-        }
-        if ($this->container['sepa_purpose_code'] === null) {
-            $invalidProperties[] = "'sepa_purpose_code' can't be null";
-        }
-        if ($this->container['bank_transaction_code'] === null) {
-            $invalidProperties[] = "'bank_transaction_code' can't be null";
-        }
-        if ($this->container['primanota'] === null) {
-            $invalidProperties[] = "'primanota' can't be null";
-        }
-        if ($this->container['category'] === null) {
-            $invalidProperties[] = "'category' can't be null";
-        }
         if ($this->container['labels'] === null) {
             $invalidProperties[] = "'labels' can't be null";
         }
@@ -624,30 +564,6 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
         }
         if ($this->container['import_date'] === null) {
             $invalidProperties[] = "'import_date' can't be null";
-        }
-        if ($this->container['children'] === null) {
-            $invalidProperties[] = "'children' can't be null";
-        }
-        if ($this->container['paypal_data'] === null) {
-            $invalidProperties[] = "'paypal_data' can't be null";
-        }
-        if ($this->container['end_to_end_reference'] === null) {
-            $invalidProperties[] = "'end_to_end_reference' can't be null";
-        }
-        if ($this->container['compensation_amount'] === null) {
-            $invalidProperties[] = "'compensation_amount' can't be null";
-        }
-        if ($this->container['original_amount'] === null) {
-            $invalidProperties[] = "'original_amount' can't be null";
-        }
-        if ($this->container['original_currency'] === null) {
-            $invalidProperties[] = "'original_currency' can't be null";
-        }
-        if ($this->container['different_debitor'] === null) {
-            $invalidProperties[] = "'different_debitor' can't be null";
-        }
-        if ($this->container['different_creditor'] === null) {
-            $invalidProperties[] = "'different_creditor' can't be null";
         }
         return $invalidProperties;
     }
@@ -696,7 +612,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets parent_id
      *
-     * @return int
+     * @return int|null
      */
     public function getParentId()
     {
@@ -706,7 +622,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets parent_id
      *
-     * @param int $parent_id Parent transaction identifier
+     * @param int|null $parent_id Parent transaction identifier
      *
      * @return self
      */
@@ -714,14 +630,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     {
 
         if (is_null($parent_id)) {
-            array_push($this->openAPINullablesSetToNull, 'parent_id');
-        } else {
-            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
-            $index = array_search('parent_id', $nullablesSetToNull);
-            if ($index !== FALSE) {
-                unset($nullablesSetToNull[$index]);
-                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
-            }
+            throw new \InvalidArgumentException('non-nullable parent_id cannot be null');
         }
 
         $this->container['parent_id'] = $parent_id;
@@ -761,7 +670,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets value_date
      *
-     * @return string
+     * @return \DateTime
      */
     public function getValueDate()
     {
@@ -771,7 +680,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets value_date
      *
-     * @param string $value_date <strong>Format:</strong> 'YYYY-MM-DD HH:MM:SS.SSS' (german time)<br/>Value date.
+     * @param \DateTime $value_date <strong>Format:</strong> 'YYYY-MM-DD'<br/>Value date.
      *
      * @return self
      */
@@ -790,7 +699,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets bank_booking_date
      *
-     * @return string
+     * @return \DateTime
      */
     public function getBankBookingDate()
     {
@@ -800,7 +709,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets bank_booking_date
      *
-     * @param string $bank_booking_date <strong>Format:</strong> 'YYYY-MM-DD HH:MM:SS.SSS' (german time)<br/>Bank booking date.
+     * @param \DateTime $bank_booking_date <strong>Format:</strong> 'YYYY-MM-DD'<br/>Bank booking date.
      *
      * @return self
      */
@@ -819,7 +728,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets finapi_booking_date
      *
-     * @return string
+     * @return \DateTime
      */
     public function getFinapiBookingDate()
     {
@@ -829,7 +738,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets finapi_booking_date
      *
-     * @param string $finapi_booking_date <strong>Format:</strong> 'YYYY-MM-DD HH:MM:SS.SSS' (german time)<br/>finAPI Booking date. NOTE: In some cases, banks may deliver transactions that are booked in future, but already included in the current account balance. To keep the account balance consistent with the set of transactions, such \"future transactions\" will be imported with their finapiBookingDate set to the current date (i.e.: date of import). The finapiBookingDate will automatically get adjusted towards the bankBookingDate each time the associated bank account is updated. Example: A transaction is imported on July, 3rd, with a bank reported booking date of July, 6th. The transaction will be imported with its finapiBookingDate set to July, 3rd. Then, on July 4th, the associated account is updated. During this update, the transaction's finapiBookingDate will be automatically adjusted to July 4th. This adjustment of the finapiBookingDate takes place on each update until the bank account is updated on July 6th or later, in which case the transaction's finapiBookingDate will be adjusted to its final value, July 6th.<br/> The finapiBookingDate is the date that is used by the finAPI PFM services. E.g. when you calculate the spendings of an account for the current month, and have a transaction with finapiBookingDate in the current month but bankBookingDate at the beginning of the next month, then this transaction is included in the calculations (as the bank has this transaction's amount included in the current account balance as well).
+     * @param \DateTime $finapi_booking_date <strong>Format:</strong> 'YYYY-MM-DD'<br/>finAPI Booking date. NOTE: In some cases, banks may deliver transactions that are booked in future, but already included in the current account balance. To keep the account balance consistent with the set of transactions, such \"future transactions\" will be imported with their finapiBookingDate set to the current date (i.e.: date of import). The finapiBookingDate will automatically get adjusted towards the bankBookingDate each time the associated bank account is updated. Example: A transaction is imported on July, 3rd, with a bank reported booking date of July, 6th. The transaction will be imported with its finapiBookingDate set to July, 3rd. Then, on July 4th, the associated account is updated. During this update, the transaction's finapiBookingDate will be automatically adjusted to July 4th. This adjustment of the finapiBookingDate takes place on each update until the bank account is updated on July 6th or later, in which case the transaction's finapiBookingDate will be adjusted to its final value, July 6th.<br/> The finapiBookingDate is the date that is used by the finAPI PFM services. E.g. when you calculate the spendings of an account for the current month, and have a transaction with finapiBookingDate in the current month but bankBookingDate at the beginning of the next month, then this transaction is included in the calculations (as the bank has this transaction's amount included in the current account balance as well).
      *
      * @return self
      */
@@ -877,7 +786,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets currency
      *
-     * @return Currency
+     * @return Currency|null
      */
     public function getCurrency()
     {
@@ -887,7 +796,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets currency
      *
-     * @param Currency $currency <strong>Type:</strong> Currency<br/> Transaction currency in ISO 4217 format.This field can be null if not explicitly provided the bank. In this case it can be assumed as account’s currency.
+     * @param Currency|null $currency <strong>Type:</strong> Currency<br/> Transaction currency in ISO 4217 format.This field can be null if not explicitly provided the bank. In this case it can be assumed as account’s currency.
      *
      * @return self
      */
@@ -895,14 +804,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     {
 
         if (is_null($currency)) {
-            array_push($this->openAPINullablesSetToNull, 'currency');
-        } else {
-            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
-            $index = array_search('currency', $nullablesSetToNull);
-            if ($index !== FALSE) {
-                unset($nullablesSetToNull[$index]);
-                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
-            }
+            throw new \InvalidArgumentException('non-nullable currency cannot be null');
         }
 
         $this->container['currency'] = $currency;
@@ -913,7 +815,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets purpose
      *
-     * @return string
+     * @return string|null
      */
     public function getPurpose()
     {
@@ -923,7 +825,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets purpose
      *
-     * @param string $purpose Transaction purpose. Maximum length: 2000
+     * @param string|null $purpose Transaction purpose. Maximum length: 2000
      *
      * @return self
      */
@@ -931,14 +833,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     {
 
         if (is_null($purpose)) {
-            array_push($this->openAPINullablesSetToNull, 'purpose');
-        } else {
-            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
-            $index = array_search('purpose', $nullablesSetToNull);
-            if ($index !== FALSE) {
-                unset($nullablesSetToNull[$index]);
-                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
-            }
+            throw new \InvalidArgumentException('non-nullable purpose cannot be null');
         }
 
         $this->container['purpose'] = $purpose;
@@ -949,7 +844,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets counterpart_name
      *
-     * @return string
+     * @return string|null
      */
     public function getCounterpartName()
     {
@@ -959,7 +854,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets counterpart_name
      *
-     * @param string $counterpart_name Counterpart name. Maximum length: 80
+     * @param string|null $counterpart_name Counterpart name. Maximum length: 80
      *
      * @return self
      */
@@ -967,14 +862,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     {
 
         if (is_null($counterpart_name)) {
-            array_push($this->openAPINullablesSetToNull, 'counterpart_name');
-        } else {
-            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
-            $index = array_search('counterpart_name', $nullablesSetToNull);
-            if ($index !== FALSE) {
-                unset($nullablesSetToNull[$index]);
-                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
-            }
+            throw new \InvalidArgumentException('non-nullable counterpart_name cannot be null');
         }
 
         $this->container['counterpart_name'] = $counterpart_name;
@@ -985,7 +873,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets counterpart_account_number
      *
-     * @return string
+     * @return string|null
      */
     public function getCounterpartAccountNumber()
     {
@@ -995,7 +883,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets counterpart_account_number
      *
-     * @param string $counterpart_account_number Counterpart account number
+     * @param string|null $counterpart_account_number Counterpart account number
      *
      * @return self
      */
@@ -1003,14 +891,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     {
 
         if (is_null($counterpart_account_number)) {
-            array_push($this->openAPINullablesSetToNull, 'counterpart_account_number');
-        } else {
-            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
-            $index = array_search('counterpart_account_number', $nullablesSetToNull);
-            if ($index !== FALSE) {
-                unset($nullablesSetToNull[$index]);
-                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
-            }
+            throw new \InvalidArgumentException('non-nullable counterpart_account_number cannot be null');
         }
 
         $this->container['counterpart_account_number'] = $counterpart_account_number;
@@ -1021,7 +902,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets counterpart_iban
      *
-     * @return string
+     * @return string|null
      */
     public function getCounterpartIban()
     {
@@ -1031,7 +912,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets counterpart_iban
      *
-     * @param string $counterpart_iban Counterpart IBAN
+     * @param string|null $counterpart_iban Counterpart IBAN
      *
      * @return self
      */
@@ -1039,14 +920,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     {
 
         if (is_null($counterpart_iban)) {
-            array_push($this->openAPINullablesSetToNull, 'counterpart_iban');
-        } else {
-            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
-            $index = array_search('counterpart_iban', $nullablesSetToNull);
-            if ($index !== FALSE) {
-                unset($nullablesSetToNull[$index]);
-                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
-            }
+            throw new \InvalidArgumentException('non-nullable counterpart_iban cannot be null');
         }
 
         $this->container['counterpart_iban'] = $counterpart_iban;
@@ -1057,7 +931,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets counterpart_blz
      *
-     * @return string
+     * @return string|null
      */
     public function getCounterpartBlz()
     {
@@ -1067,7 +941,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets counterpart_blz
      *
-     * @param string $counterpart_blz Counterpart BLZ
+     * @param string|null $counterpart_blz Counterpart BLZ
      *
      * @return self
      */
@@ -1075,14 +949,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     {
 
         if (is_null($counterpart_blz)) {
-            array_push($this->openAPINullablesSetToNull, 'counterpart_blz');
-        } else {
-            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
-            $index = array_search('counterpart_blz', $nullablesSetToNull);
-            if ($index !== FALSE) {
-                unset($nullablesSetToNull[$index]);
-                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
-            }
+            throw new \InvalidArgumentException('non-nullable counterpart_blz cannot be null');
         }
 
         $this->container['counterpart_blz'] = $counterpart_blz;
@@ -1093,7 +960,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets counterpart_bic
      *
-     * @return string
+     * @return string|null
      */
     public function getCounterpartBic()
     {
@@ -1103,7 +970,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets counterpart_bic
      *
-     * @param string $counterpart_bic Counterpart BIC
+     * @param string|null $counterpart_bic Counterpart BIC
      *
      * @return self
      */
@@ -1111,14 +978,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     {
 
         if (is_null($counterpart_bic)) {
-            array_push($this->openAPINullablesSetToNull, 'counterpart_bic');
-        } else {
-            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
-            $index = array_search('counterpart_bic', $nullablesSetToNull);
-            if ($index !== FALSE) {
-                unset($nullablesSetToNull[$index]);
-                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
-            }
+            throw new \InvalidArgumentException('non-nullable counterpart_bic cannot be null');
         }
 
         $this->container['counterpart_bic'] = $counterpart_bic;
@@ -1129,7 +989,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets counterpart_bank_name
      *
-     * @return string
+     * @return string|null
      */
     public function getCounterpartBankName()
     {
@@ -1139,7 +999,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets counterpart_bank_name
      *
-     * @param string $counterpart_bank_name Counterpart Bank name
+     * @param string|null $counterpart_bank_name Counterpart Bank name
      *
      * @return self
      */
@@ -1147,14 +1007,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     {
 
         if (is_null($counterpart_bank_name)) {
-            array_push($this->openAPINullablesSetToNull, 'counterpart_bank_name');
-        } else {
-            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
-            $index = array_search('counterpart_bank_name', $nullablesSetToNull);
-            if ($index !== FALSE) {
-                unset($nullablesSetToNull[$index]);
-                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
-            }
+            throw new \InvalidArgumentException('non-nullable counterpart_bank_name cannot be null');
         }
 
         $this->container['counterpart_bank_name'] = $counterpart_bank_name;
@@ -1165,7 +1018,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets counterpart_mandate_reference
      *
-     * @return string
+     * @return string|null
      */
     public function getCounterpartMandateReference()
     {
@@ -1175,7 +1028,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets counterpart_mandate_reference
      *
-     * @param string $counterpart_mandate_reference The mandate reference of the counterpart
+     * @param string|null $counterpart_mandate_reference The mandate reference of the counterpart
      *
      * @return self
      */
@@ -1183,14 +1036,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     {
 
         if (is_null($counterpart_mandate_reference)) {
-            array_push($this->openAPINullablesSetToNull, 'counterpart_mandate_reference');
-        } else {
-            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
-            $index = array_search('counterpart_mandate_reference', $nullablesSetToNull);
-            if ($index !== FALSE) {
-                unset($nullablesSetToNull[$index]);
-                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
-            }
+            throw new \InvalidArgumentException('non-nullable counterpart_mandate_reference cannot be null');
         }
 
         $this->container['counterpart_mandate_reference'] = $counterpart_mandate_reference;
@@ -1201,7 +1047,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets counterpart_customer_reference
      *
-     * @return string
+     * @return string|null
      */
     public function getCounterpartCustomerReference()
     {
@@ -1211,7 +1057,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets counterpart_customer_reference
      *
-     * @param string $counterpart_customer_reference The customer reference of the counterpart
+     * @param string|null $counterpart_customer_reference The customer reference of the counterpart
      *
      * @return self
      */
@@ -1219,14 +1065,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     {
 
         if (is_null($counterpart_customer_reference)) {
-            array_push($this->openAPINullablesSetToNull, 'counterpart_customer_reference');
-        } else {
-            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
-            $index = array_search('counterpart_customer_reference', $nullablesSetToNull);
-            if ($index !== FALSE) {
-                unset($nullablesSetToNull[$index]);
-                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
-            }
+            throw new \InvalidArgumentException('non-nullable counterpart_customer_reference cannot be null');
         }
 
         $this->container['counterpart_customer_reference'] = $counterpart_customer_reference;
@@ -1237,7 +1076,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets counterpart_creditor_id
      *
-     * @return string
+     * @return string|null
      */
     public function getCounterpartCreditorId()
     {
@@ -1247,7 +1086,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets counterpart_creditor_id
      *
-     * @param string $counterpart_creditor_id The creditor ID of the counterpart. Exists only for SEPA direct debit transactions (\"Lastschrift\").
+     * @param string|null $counterpart_creditor_id The creditor ID of the counterpart. Exists only for SEPA direct debit transactions (\"Lastschrift\").
      *
      * @return self
      */
@@ -1255,14 +1094,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     {
 
         if (is_null($counterpart_creditor_id)) {
-            array_push($this->openAPINullablesSetToNull, 'counterpart_creditor_id');
-        } else {
-            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
-            $index = array_search('counterpart_creditor_id', $nullablesSetToNull);
-            if ($index !== FALSE) {
-                unset($nullablesSetToNull[$index]);
-                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
-            }
+            throw new \InvalidArgumentException('non-nullable counterpart_creditor_id cannot be null');
         }
 
         $this->container['counterpart_creditor_id'] = $counterpart_creditor_id;
@@ -1273,7 +1105,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets counterpart_debitor_id
      *
-     * @return string
+     * @return string|null
      */
     public function getCounterpartDebitorId()
     {
@@ -1283,7 +1115,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets counterpart_debitor_id
      *
-     * @param string $counterpart_debitor_id The originator's identification code. Exists only for SEPA money transfer transactions (\"Überweisung\").
+     * @param string|null $counterpart_debitor_id The originator's identification code. Exists only for SEPA money transfer transactions (\"Überweisung\").
      *
      * @return self
      */
@@ -1291,14 +1123,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     {
 
         if (is_null($counterpart_debitor_id)) {
-            array_push($this->openAPINullablesSetToNull, 'counterpart_debitor_id');
-        } else {
-            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
-            $index = array_search('counterpart_debitor_id', $nullablesSetToNull);
-            if ($index !== FALSE) {
-                unset($nullablesSetToNull[$index]);
-                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
-            }
+            throw new \InvalidArgumentException('non-nullable counterpart_debitor_id cannot be null');
         }
 
         $this->container['counterpart_debitor_id'] = $counterpart_debitor_id;
@@ -1309,7 +1134,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets type
      *
-     * @return string
+     * @return string|null
      */
     public function getType()
     {
@@ -1319,7 +1144,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets type
      *
-     * @param string $type Transaction type, according to the bank. If set, this will contain a German term that you can display to the user. Some examples of common values are: \"Lastschrift\", \"Auslands&uuml;berweisung\", \"Geb&uuml;hren\", \"Zinsen\". The maximum possible length of this field is 255 characters.
+     * @param string|null $type Transaction type, according to the bank. If set, this will contain a German term that you can display to the user. Some examples of common values are: \"Lastschrift\", \"Auslands&uuml;berweisung\", \"Geb&uuml;hren\", \"Zinsen\". The maximum possible length of this field is 255 characters.
      *
      * @return self
      */
@@ -1327,14 +1152,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     {
 
         if (is_null($type)) {
-            array_push($this->openAPINullablesSetToNull, 'type');
-        } else {
-            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
-            $index = array_search('type', $nullablesSetToNull);
-            if ($index !== FALSE) {
-                unset($nullablesSetToNull[$index]);
-                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
-            }
+            throw new \InvalidArgumentException('non-nullable type cannot be null');
         }
 
         $this->container['type'] = $type;
@@ -1345,7 +1163,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets type_code_zka
      *
-     * @return string
+     * @return string|null
      */
     public function getTypeCodeZka()
     {
@@ -1355,7 +1173,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets type_code_zka
      *
-     * @param string $type_code_zka ZKA business transaction code which relates to the transaction's type. Possible values range from 1 through 999. If no information about the ZKA type code is available, then this field will be null.
+     * @param string|null $type_code_zka ZKA business transaction code which relates to the transaction's type. Possible values range from 1 through 999. If no information about the ZKA type code is available, then this field will be null.
      *
      * @return self
      */
@@ -1363,14 +1181,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     {
 
         if (is_null($type_code_zka)) {
-            array_push($this->openAPINullablesSetToNull, 'type_code_zka');
-        } else {
-            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
-            $index = array_search('type_code_zka', $nullablesSetToNull);
-            if ($index !== FALSE) {
-                unset($nullablesSetToNull[$index]);
-                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
-            }
+            throw new \InvalidArgumentException('non-nullable type_code_zka cannot be null');
         }
 
         $this->container['type_code_zka'] = $type_code_zka;
@@ -1381,7 +1192,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets type_code_swift
      *
-     * @return string
+     * @return string|null
      */
     public function getTypeCodeSwift()
     {
@@ -1391,7 +1202,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets type_code_swift
      *
-     * @param string $type_code_swift SWIFT transaction type code. If no information about the SWIFT code is available, then this field will be null.
+     * @param string|null $type_code_swift SWIFT transaction type code. If no information about the SWIFT code is available, then this field will be null.
      *
      * @return self
      */
@@ -1399,14 +1210,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     {
 
         if (is_null($type_code_swift)) {
-            array_push($this->openAPINullablesSetToNull, 'type_code_swift');
-        } else {
-            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
-            $index = array_search('type_code_swift', $nullablesSetToNull);
-            if ($index !== FALSE) {
-                unset($nullablesSetToNull[$index]);
-                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
-            }
+            throw new \InvalidArgumentException('non-nullable type_code_swift cannot be null');
         }
 
         $this->container['type_code_swift'] = $type_code_swift;
@@ -1417,7 +1221,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets sepa_purpose_code
      *
-     * @return string
+     * @return string|null
      */
     public function getSepaPurposeCode()
     {
@@ -1427,7 +1231,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets sepa_purpose_code
      *
-     * @param string $sepa_purpose_code SEPA purpose code, according to ISO 20022
+     * @param string|null $sepa_purpose_code SEPA purpose code, according to ISO 20022
      *
      * @return self
      */
@@ -1435,14 +1239,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     {
 
         if (is_null($sepa_purpose_code)) {
-            array_push($this->openAPINullablesSetToNull, 'sepa_purpose_code');
-        } else {
-            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
-            $index = array_search('sepa_purpose_code', $nullablesSetToNull);
-            if ($index !== FALSE) {
-                unset($nullablesSetToNull[$index]);
-                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
-            }
+            throw new \InvalidArgumentException('non-nullable sepa_purpose_code cannot be null');
         }
 
         $this->container['sepa_purpose_code'] = $sepa_purpose_code;
@@ -1453,7 +1250,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets bank_transaction_code
      *
-     * @return string
+     * @return string|null
      */
     public function getBankTransactionCode()
     {
@@ -1463,7 +1260,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets bank_transaction_code
      *
-     * @param string $bank_transaction_code Bank transaction code, according to ISO 20022
+     * @param string|null $bank_transaction_code Bank transaction code, according to ISO 20022
      *
      * @return self
      */
@@ -1471,14 +1268,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     {
 
         if (is_null($bank_transaction_code)) {
-            array_push($this->openAPINullablesSetToNull, 'bank_transaction_code');
-        } else {
-            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
-            $index = array_search('bank_transaction_code', $nullablesSetToNull);
-            if ($index !== FALSE) {
-                unset($nullablesSetToNull[$index]);
-                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
-            }
+            throw new \InvalidArgumentException('non-nullable bank_transaction_code cannot be null');
         }
 
         $this->container['bank_transaction_code'] = $bank_transaction_code;
@@ -1489,7 +1279,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets primanota
      *
-     * @return string
+     * @return string|null
      */
     public function getPrimanota()
     {
@@ -1499,7 +1289,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets primanota
      *
-     * @param string $primanota Transaction primanota (bank side identification number)
+     * @param string|null $primanota Transaction primanota (bank side identification number)
      *
      * @return self
      */
@@ -1507,14 +1297,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     {
 
         if (is_null($primanota)) {
-            array_push($this->openAPINullablesSetToNull, 'primanota');
-        } else {
-            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
-            $index = array_search('primanota', $nullablesSetToNull);
-            if ($index !== FALSE) {
-                unset($nullablesSetToNull[$index]);
-                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
-            }
+            throw new \InvalidArgumentException('non-nullable primanota cannot be null');
         }
 
         $this->container['primanota'] = $primanota;
@@ -1525,7 +1308,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets category
      *
-     * @return \OpenAPIAccess\Client\Model\TransactionCategory
+     * @return \OpenAPIAccess\Client\Model\TransactionCategory|null
      */
     public function getCategory()
     {
@@ -1535,7 +1318,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets category
      *
-     * @param \OpenAPIAccess\Client\Model\TransactionCategory $category category
+     * @param \OpenAPIAccess\Client\Model\TransactionCategory|null $category category
      *
      * @return self
      */
@@ -1543,14 +1326,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     {
 
         if (is_null($category)) {
-            array_push($this->openAPINullablesSetToNull, 'category');
-        } else {
-            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
-            $index = array_search('category', $nullablesSetToNull);
-            if ($index !== FALSE) {
-                unset($nullablesSetToNull[$index]);
-                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
-            }
+            throw new \InvalidArgumentException('non-nullable category cannot be null');
         }
 
         $this->container['category'] = $category;
@@ -1677,7 +1453,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets import_date
      *
-     * @return string
+     * @return \DateTime
      */
     public function getImportDate()
     {
@@ -1687,7 +1463,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets import_date
      *
-     * @param string $import_date <strong>Format:</strong> 'YYYY-MM-DD HH:MM:SS.SSS' (german time)<br/>Date of transaction import.
+     * @param \DateTime $import_date <strong>Format:</strong> 'YYYY-MM-DD'T'HH:MM:SS.SSSXXX' (RFC 3339, section 5.6)<br/>Date of transaction import.
      *
      * @return self
      */
@@ -1706,7 +1482,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets children
      *
-     * @return int[]
+     * @return int[]|null
      */
     public function getChildren()
     {
@@ -1716,7 +1492,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets children
      *
-     * @param int[] $children Sub-transactions identifiers (if this transaction is split)
+     * @param int[]|null $children Sub-transactions identifiers (if this transaction is split)
      *
      * @return self
      */
@@ -1724,14 +1500,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     {
 
         if (is_null($children)) {
-            array_push($this->openAPINullablesSetToNull, 'children');
-        } else {
-            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
-            $index = array_search('children', $nullablesSetToNull);
-            if ($index !== FALSE) {
-                unset($nullablesSetToNull[$index]);
-                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
-            }
+            throw new \InvalidArgumentException('non-nullable children cannot be null');
         }
 
         $this->container['children'] = $children;
@@ -1742,7 +1511,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets paypal_data
      *
-     * @return \OpenAPIAccess\Client\Model\TransactionPaypalData
+     * @return \OpenAPIAccess\Client\Model\PendingTransactionPaypalData|null
      */
     public function getPaypalData()
     {
@@ -1752,7 +1521,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets paypal_data
      *
-     * @param \OpenAPIAccess\Client\Model\TransactionPaypalData $paypal_data paypal_data
+     * @param \OpenAPIAccess\Client\Model\PendingTransactionPaypalData|null $paypal_data paypal_data
      *
      * @return self
      */
@@ -1760,14 +1529,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     {
 
         if (is_null($paypal_data)) {
-            array_push($this->openAPINullablesSetToNull, 'paypal_data');
-        } else {
-            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
-            $index = array_search('paypal_data', $nullablesSetToNull);
-            if ($index !== FALSE) {
-                unset($nullablesSetToNull[$index]);
-                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
-            }
+            throw new \InvalidArgumentException('non-nullable paypal_data cannot be null');
         }
 
         $this->container['paypal_data'] = $paypal_data;
@@ -1778,7 +1540,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets end_to_end_reference
      *
-     * @return string
+     * @return string|null
      */
     public function getEndToEndReference()
     {
@@ -1788,7 +1550,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets end_to_end_reference
      *
-     * @param string $end_to_end_reference End-To-End reference
+     * @param string|null $end_to_end_reference End-To-End reference
      *
      * @return self
      */
@@ -1796,14 +1558,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     {
 
         if (is_null($end_to_end_reference)) {
-            array_push($this->openAPINullablesSetToNull, 'end_to_end_reference');
-        } else {
-            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
-            $index = array_search('end_to_end_reference', $nullablesSetToNull);
-            if ($index !== FALSE) {
-                unset($nullablesSetToNull[$index]);
-                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
-            }
+            throw new \InvalidArgumentException('non-nullable end_to_end_reference cannot be null');
         }
 
         $this->container['end_to_end_reference'] = $end_to_end_reference;
@@ -1814,7 +1569,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets compensation_amount
      *
-     * @return float
+     * @return float|null
      */
     public function getCompensationAmount()
     {
@@ -1824,7 +1579,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets compensation_amount
      *
-     * @param float $compensation_amount Compensation Amount. Sum of reimbursement of out-of-pocket expenses plus processing brokerage in case of a national return / refund debit as well as an optional interest equalisation. Exists predominantly for SEPA direct debit returns.
+     * @param float|null $compensation_amount Compensation Amount. Sum of reimbursement of out-of-pocket expenses plus processing brokerage in case of a national return / refund debit as well as an optional interest equalisation. Exists predominantly for SEPA direct debit returns.
      *
      * @return self
      */
@@ -1832,14 +1587,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     {
 
         if (is_null($compensation_amount)) {
-            array_push($this->openAPINullablesSetToNull, 'compensation_amount');
-        } else {
-            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
-            $index = array_search('compensation_amount', $nullablesSetToNull);
-            if ($index !== FALSE) {
-                unset($nullablesSetToNull[$index]);
-                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
-            }
+            throw new \InvalidArgumentException('non-nullable compensation_amount cannot be null');
         }
 
         $this->container['compensation_amount'] = $compensation_amount;
@@ -1850,7 +1598,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets original_amount
      *
-     * @return float
+     * @return float|null
      */
     public function getOriginalAmount()
     {
@@ -1860,7 +1608,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets original_amount
      *
-     * @param float $original_amount Original Amount of the original direct debit. Exists predominantly for SEPA direct debit returns.
+     * @param float|null $original_amount Original Amount of the original direct debit. Exists predominantly for SEPA direct debit returns.
      *
      * @return self
      */
@@ -1868,14 +1616,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     {
 
         if (is_null($original_amount)) {
-            array_push($this->openAPINullablesSetToNull, 'original_amount');
-        } else {
-            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
-            $index = array_search('original_amount', $nullablesSetToNull);
-            if ($index !== FALSE) {
-                unset($nullablesSetToNull[$index]);
-                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
-            }
+            throw new \InvalidArgumentException('non-nullable original_amount cannot be null');
         }
 
         $this->container['original_amount'] = $original_amount;
@@ -1886,7 +1627,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets original_currency
      *
-     * @return Currency
+     * @return Currency|null
      */
     public function getOriginalCurrency()
     {
@@ -1896,7 +1637,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets original_currency
      *
-     * @param Currency $original_currency <strong>Type:</strong> Currency<br/> Currency of the original amount in ISO 4217 format. This field can be null if not explicitly provided the bank. In this case it can be assumed as account’s currency.
+     * @param Currency|null $original_currency <strong>Type:</strong> Currency<br/> Currency of the original amount in ISO 4217 format. This field can be null if not explicitly provided the bank. In this case it can be assumed as account’s currency.
      *
      * @return self
      */
@@ -1904,14 +1645,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     {
 
         if (is_null($original_currency)) {
-            array_push($this->openAPINullablesSetToNull, 'original_currency');
-        } else {
-            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
-            $index = array_search('original_currency', $nullablesSetToNull);
-            if ($index !== FALSE) {
-                unset($nullablesSetToNull[$index]);
-                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
-            }
+            throw new \InvalidArgumentException('non-nullable original_currency cannot be null');
         }
 
         $this->container['original_currency'] = $original_currency;
@@ -1922,7 +1656,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets different_debitor
      *
-     * @return string
+     * @return string|null
      */
     public function getDifferentDebitor()
     {
@@ -1932,7 +1666,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets different_debitor
      *
-     * @param string $different_debitor Payer's/debtor's reference party (in the case of a credit transfer) or payee's/creditor's reference party (in the case of a direct debit)
+     * @param string|null $different_debitor Payer's/debtor's reference party (in the case of a credit transfer) or payee's/creditor's reference party (in the case of a direct debit)
      *
      * @return self
      */
@@ -1940,14 +1674,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     {
 
         if (is_null($different_debitor)) {
-            array_push($this->openAPINullablesSetToNull, 'different_debitor');
-        } else {
-            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
-            $index = array_search('different_debitor', $nullablesSetToNull);
-            if ($index !== FALSE) {
-                unset($nullablesSetToNull[$index]);
-                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
-            }
+            throw new \InvalidArgumentException('non-nullable different_debitor cannot be null');
         }
 
         $this->container['different_debitor'] = $different_debitor;
@@ -1958,7 +1685,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets different_creditor
      *
-     * @return string
+     * @return string|null
      */
     public function getDifferentCreditor()
     {
@@ -1968,7 +1695,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets different_creditor
      *
-     * @param string $different_creditor Payee's/creditor's reference party (in the case of a credit transfer) or payer's/debtor's reference party (in the case of a direct debit)
+     * @param string|null $different_creditor Payee's/creditor's reference party (in the case of a credit transfer) or payer's/debtor's reference party (in the case of a direct debit)
      *
      * @return self
      */
@@ -1976,14 +1703,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     {
 
         if (is_null($different_creditor)) {
-            array_push($this->openAPINullablesSetToNull, 'different_creditor');
-        } else {
-            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
-            $index = array_search('different_creditor', $nullablesSetToNull);
-            if ($index !== FALSE) {
-                unset($nullablesSetToNull[$index]);
-                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
-            }
+            throw new \InvalidArgumentException('non-nullable different_creditor cannot be null');
         }
 
         $this->container['different_creditor'] = $different_creditor;
