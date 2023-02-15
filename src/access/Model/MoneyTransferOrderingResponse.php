@@ -11,14 +11,14 @@
  */
 
 /**
- * finAPI Access
+ * finAPI Access V1 (deprecated)
  *
- * <strong>RESTful API for Account Information Services (AIS) and Payment Initiation Services (PIS)</strong>  The following pages give you some general information on how to use our APIs.<br/> The actual API services documentation then follows further below. You can use the menu to jump between API sections. <br/> <br/> This page has a built-in HTTP(S) client, so you can test the services directly from within this page, by filling in the request parameters and/or body in the respective services, and then hitting the TRY button. Note that you need to be authorized to make a successful API call. To authorize, refer to the 'Authorization' section of the API, or just use the OAUTH button that can be found near the TRY button. <br/>  <h2 id=\"general-information\">General information</h2>  <h3 id=\"general-error-responses\"><strong>Error Responses</strong></h3> When an API call returns with an error, then in general it has the structure shown in the following example:  <pre> {   \"errors\": [     {       \"message\": \"Interface 'FINTS_SERVER' is not supported for this operation.\",       \"code\": \"BAD_REQUEST\",       \"type\": \"TECHNICAL\"     }   ],   \"date\": \"2020-11-19 16:54:06.854\",   \"requestId\": \"selfgen-312042e7-df55-47e4-bffd-956a68ef37b5\",   \"endpoint\": \"POST /api/v1/bankConnections/import\",   \"authContext\": \"1/21\",   \"bank\": \"DEMO0002 - finAPI Test Redirect Bank\" } </pre>  If an API call requires an additional authentication by the user, HTTP code 510 is returned and the error response contains the additional \"multiStepAuthentication\" object, see the following example:  <pre> {   \"errors\": [     {       \"message\": \"Es ist eine zusätzliche Authentifizierung erforderlich. Bitte geben Sie folgenden Code an: 123456\",       \"code\": \"ADDITIONAL_AUTHENTICATION_REQUIRED\",       \"type\": \"BUSINESS\",       \"multiStepAuthentication\": {         \"hash\": \"678b13f4be9ed7d981a840af8131223a\",         \"status\": \"CHALLENGE_RESPONSE_REQUIRED\",         \"challengeMessage\": \"Es ist eine zusätzliche Authentifizierung erforderlich. Bitte geben Sie folgenden Code an: 123456\",         \"answerFieldLabel\": \"TAN\",         \"redirectUrl\": null,         \"redirectContext\": null,         \"redirectContextField\": null,         \"twoStepProcedures\": null,         \"photoTanMimeType\": null,         \"photoTanData\": null,         \"opticalData\": null,         \"opticalDataAsReinerSct\": false       }     }   ],   \"date\": \"2019-11-29 09:51:55.931\",   \"requestId\": \"selfgen-45059c99-1b14-4df7-9bd3-9d5f126df294\",   \"endpoint\": \"POST /api/v1/bankConnections/import\",   \"authContext\": \"1/18\",   \"bank\": \"DEMO0001 - finAPI Test Bank\" } </pre>  An exception to this error format are API authentication errors, where the following structure is returned:  <pre> {   \"error\": \"invalid_token\",   \"error_description\": \"Invalid access token: cccbce46-xxxx-xxxx-xxxx-xxxxxxxxxx\" } </pre>  <h3 id=\"general-paging\"><strong>Paging</strong></h3> API services that may potentially return a lot of data implement paging. They return a limited number of entries within a \"page\". Further entries must be fetched with subsequent calls. <br/><br/> Any API service that implements paging provides the following input parameters:<br/> &bull; \"page\": the number of the page to be retrieved (starting with 1).<br/> &bull; \"perPage\": the number of entries within a page. The default and maximum value is stated in the documentation of the respective services.  A paged response contains an additional \"paging\" object with the following structure:  <pre> {   ...   ,   \"paging\": {     \"page\": 1,     \"perPage\": 20,     \"pageCount\": 234,     \"totalCount\": 4662   } } </pre>  <h3 id=\"general-internationalization\"><strong>Internationalization</strong></h3> The finAPI services support internationalization which means you can define the language you prefer for API service responses. <br/><br/> The following languages are available: German, English, Czech, Slovak. <br/><br/> The preferred language can be defined by providing the official HTTP <strong>Accept-Language</strong> header. <br/><br/> finAPI reacts on the official iso language codes &quot;de&quot;, &quot;en&quot;, &quot;cs&quot; and &quot;sk&quot; for the named languages. Additional subtags supported by the Accept-Language header may be provided, e.g. &quot;en-US&quot;, but are ignored. <br/> If no Accept-Language header is given, German is used as the default language. <br/><br/> Exceptions:<br/> &bull; Bank login hints and login fields are only available in the language of the bank and not being translated.<br/> &bull; Direct messages from the bank systems typically returned as BUSINESS errors will not be translated.<br/> &bull; BUSINESS errors created by finAPI directly are available in German and English.<br/> &bull; TECHNICAL errors messages meant for developers are mostly in English, but also may be translated.  <h3 id=\"general-request-ids\"><strong>Request IDs</strong></h3> With any API call, you can pass a request ID via a header with name \"X-Request-Id\". The request ID can be an arbitrary string with up to 255 characters. Passing a longer string will result in an error. <br/><br/> If you don't pass a request ID for a call, finAPI will generate a random ID internally. <br/><br/> The request ID is always returned back in the response of a service, as a header with name \"X-Request-Id\". <br/><br/> We highly recommend to always pass a (preferably unique) request ID, and include it into your client application logs whenever you make a request or receive a response (especially in the case of an error response). finAPI is also logging request IDs on its end. Having a request ID can help the finAPI support team to work more efficiently and solve tickets faster.  <h3 id=\"general-overriding-http-methods\"><strong>Overriding HTTP methods</strong></h3> Some HTTP clients do not support the HTTP methods PATCH or DELETE. If you are using such a client in your application, you can use a POST request instead with a special HTTP header indicating the originally intended HTTP method. <br/><br/> The header's name is <strong>X-HTTP-Method-Override</strong>. Set its value to either <strong>PATCH</strong> or <strong>DELETE</strong>. POST Requests having this header set will be treated either as PATCH or DELETE by the finAPI servers. <br/><br/> Example: <br/><br/> <strong>X-HTTP-Method-Override: PATCH</strong><br/> POST /api/v1/label/51<br/> {\"name\": \"changed label\"}<br/><br/> will be interpreted by finAPI as:<br/><br/> PATCH /api/v1/label/51<br/> {\"name\": \"changed label\"}<br/>  <h3 id=\"general-user-metadata\"><strong>User metadata</strong></h3> With the migration to PSD2 APIs, a new term called \"User metadata\" (also known as \"PSU metadata\") has been introduced to the API. This user metadata aims to inform the banking API if there was a real end-user behind an HTTP request or if the request was triggered by a system (e.g. by an automatic batch update). In the latter case, the bank may apply some restrictions such as limiting the number of HTTP requests for a single consent. Also, some operations may be forbidden entirely by the banking API. For example, some banks do not allow issuing a new consent without the end-user being involved. Therefore, it is certainly necessary and obligatory for the customer to provide the PSU metadata for such operations. <br/><br/> As finAPI does not have direct interaction with the end-user, it is the client application's responsibility to provide all the necessary information about the end-user. This must be done by sending additional headers with every request triggered on behalf of the end-user. <br/><br/> At the moment, the following headers are supported by the API:<br/> &bull; \"PSU-IP-Address\" - the IP address of the user's device.<br/> &bull; \"PSU-Device-OS\" - the user's device and/or operating system identification.<br/> &bull; \"PSU-User-Agent\" - the user's web browser or other client device identification.  <h3 id=\"general-faq\"><strong>FAQ</strong></h3> <strong>Is there a finAPI SDK?</strong> <br/> Currently we do not offer a native SDK, but there is the option to generate an SDK for almost any target language via OpenAPI. Use the 'Download SDK' button on this page for SDK generation. <br/> <br/> <strong>How can I enable finAPI's automatic batch update?</strong> <br/> Currently there is no way to set up the batch update via the API. Please contact support@finapi.io for this. <br/> <br/> <strong>Why do I need to keep authorizing when calling services on this page?</strong> <br/> This page is a \"one-page-app\". Reloading the page resets the OAuth authorization context. There is generally no need to reload the page, so just don't do it and your authorization will persist.
+ * <strong>RESTful API for Account Information Services (AIS) and Payment Initiation Services (PIS)</strong> <br/> <strong>Application Version:</strong> 2.7.0 <br/>  The following pages give you some general information on how to use our APIs.<br/> The actual API services documentation then follows further below. You can use the menu to jump between API sections. <br/> <br/> This page has a built-in HTTP(S) client, so you can test the services directly from within this page, by filling in the request parameters and/or body in the respective services, and then hitting the TRY button. Note that you need to be authorized to make a successful API call. To authorize, refer to the 'Authorization' section of the API, or just use the OAUTH button that can be found near the TRY button. <br/>  <h2 id=\"general-information\">General information</h2>  <h3 id=\"general-error-responses\"><strong>Error Responses</strong></h3> When an API call returns with an error, then in general it has the structure shown in the following example:  <pre> {   \"errors\": [     {       \"message\": \"Interface 'FINTS_SERVER' is not supported for this operation.\",       \"code\": \"BAD_REQUEST\",       \"type\": \"TECHNICAL\"     }   ],   \"date\": \"2020-11-19 16:54:06.854\",   \"requestId\": \"selfgen-312042e7-df55-47e4-bffd-956a68ef37b5\",   \"endpoint\": \"POST /api/v1/bankConnections/import\",   \"authContext\": \"1/21\",   \"bank\": \"DEMO0002 - finAPI Test Redirect Bank\" } </pre>  If an API call requires an additional authentication by the user, HTTP code 510 is returned and the error response contains the additional \"multiStepAuthentication\" object, see the following example:  <pre> {   \"errors\": [     {       \"message\": \"Es ist eine zusätzliche Authentifizierung erforderlich. Bitte geben Sie folgenden Code an: 123456\",       \"code\": \"ADDITIONAL_AUTHENTICATION_REQUIRED\",       \"type\": \"BUSINESS\",       \"multiStepAuthentication\": {         \"hash\": \"678b13f4be9ed7d981a840af8131223a\",         \"status\": \"CHALLENGE_RESPONSE_REQUIRED\",         \"challengeMessage\": \"Es ist eine zusätzliche Authentifizierung erforderlich. Bitte geben Sie folgenden Code an: 123456\",         \"answerFieldLabel\": \"TAN\",         \"redirectUrl\": null,         \"redirectContext\": null,         \"redirectContextField\": null,         \"twoStepProcedures\": null,         \"photoTanMimeType\": null,         \"photoTanData\": null,         \"opticalData\": null,         \"opticalDataAsReinerSct\": false       }     }   ],   \"date\": \"2019-11-29 09:51:55.931\",   \"requestId\": \"selfgen-45059c99-1b14-4df7-9bd3-9d5f126df294\",   \"endpoint\": \"POST /api/v1/bankConnections/import\",   \"authContext\": \"1/18\",   \"bank\": \"DEMO0001 - finAPI Test Bank\" } </pre>  An exception to this error format are API authentication errors, where the following structure is returned:  <pre> {   \"error\": \"invalid_token\",   \"error_description\": \"Invalid access token: cccbce46-xxxx-xxxx-xxxx-xxxxxxxxxx\" } </pre>  <h3 id=\"general-paging\"><strong>Paging</strong></h3> API services that may potentially return a lot of data implement paging. They return a limited number of entries within a \"page\". Further entries must be fetched with subsequent calls. <br/><br/> Any API service that implements paging provides the following input parameters:<br/> &bull; \"page\": the number of the page to be retrieved (starting with 1).<br/> &bull; \"perPage\": the number of entries within a page. The default and maximum value is stated in the documentation of the respective services.  A paged response contains an additional \"paging\" object with the following structure:  <pre> {   ...   ,   \"paging\": {     \"page\": 1,     \"perPage\": 20,     \"pageCount\": 234,     \"totalCount\": 4662   } } </pre>  <h3 id=\"general-internationalization\"><strong>Internationalization</strong></h3> The finAPI services support internationalization which means you can define the language you prefer for API service responses. <br/><br/> The following languages are available: German, English, Czech, Slovak. <br/><br/> The preferred language can be defined by providing the official HTTP <strong>Accept-Language</strong> header. <br/><br/> finAPI reacts on the official iso language codes &quot;de&quot;, &quot;en&quot;, &quot;cs&quot; and &quot;sk&quot; for the named languages. Additional subtags supported by the Accept-Language header may be provided, e.g. &quot;en-US&quot;, but are ignored. <br/> If no Accept-Language header is given, German is used as the default language. <br/><br/> Exceptions:<br/> &bull; Bank login hints and login fields are only available in the language of the bank and not being translated.<br/> &bull; Direct messages from the bank systems typically returned as BUSINESS errors will not be translated.<br/> &bull; BUSINESS errors created by finAPI directly are available in German and English.<br/> &bull; TECHNICAL errors messages meant for developers are mostly in English, but also may be translated.  <h3 id=\"general-request-ids\"><strong>Request IDs</strong></h3> With any API call, you can pass a request ID via a header with name \"X-Request-Id\". The request ID can be an arbitrary string with up to 255 characters. Passing a longer string will result in an error. <br/><br/> If you don't pass a request ID for a call, finAPI will generate a random ID internally. <br/><br/> The request ID is always returned back in the response of a service, as a header with name \"X-Request-Id\". <br/><br/> We highly recommend to always pass a (preferably unique) request ID, and include it into your client application logs whenever you make a request or receive a response (especially in the case of an error response). finAPI is also logging request IDs on its end. Having a request ID can help the finAPI support team to work more efficiently and solve tickets faster.  <h3 id=\"general-overriding-http-methods\"><strong>Overriding HTTP methods</strong></h3> Some HTTP clients do not support the HTTP methods PATCH or DELETE. If you are using such a client in your application, you can use a POST request instead with a special HTTP header indicating the originally intended HTTP method. <br/><br/> The header's name is <strong>X-HTTP-Method-Override</strong>. Set its value to either <strong>PATCH</strong> or <strong>DELETE</strong>. POST Requests having this header set will be treated either as PATCH or DELETE by the finAPI servers. <br/><br/> Example: <br/><br/> <strong>X-HTTP-Method-Override: PATCH</strong><br/> POST /api/v1/label/51<br/> {\"name\": \"changed label\"}<br/><br/> will be interpreted by finAPI as:<br/><br/> PATCH /api/v1/label/51<br/> {\"name\": \"changed label\"}<br/>  <h3 id=\"general-user-metadata\"><strong>User metadata</strong></h3> With the migration to PSD2 APIs, a new term called \"User metadata\" (also known as \"PSU metadata\") has been introduced to the API. This user metadata aims to inform the banking API if there was a real end-user behind an HTTP request or if the request was triggered by a system (e.g. by an automatic batch update). In the latter case, the bank may apply some restrictions such as limiting the number of HTTP requests for a single consent. Also, some operations may be forbidden entirely by the banking API. For example, some banks do not allow issuing a new consent without the end-user being involved. Therefore, it is certainly necessary and obligatory for the customer to provide the PSU metadata for such operations. <br/><br/> As finAPI does not have direct interaction with the end-user, it is the client application's responsibility to provide all the necessary information about the end-user. This must be done by sending additional headers with every request triggered on behalf of the end-user. <br/><br/> At the moment, the following headers are supported by the API:<br/> &bull; \"PSU-IP-Address\" - the IP address of the user's device.<br/> &bull; \"PSU-Device-OS\" - the user's device and/or operating system identification.<br/> &bull; \"PSU-User-Agent\" - the user's web browser or other client device identification.  <h3 id=\"general-faq\"><strong>FAQ</strong></h3> <strong>Is there a finAPI SDK?</strong> <br/> Currently we do not offer a native SDK, but there is the option to generate an SDK for almost any target language via OpenAPI. Use the 'Download SDK' button on this page for SDK generation. <br/> <br/> <strong>How can I enable finAPI's automatic batch update?</strong> <br/> Currently there is no way to set up the batch update via the API. Please contact support@finapi.io for this. <br/> <br/> <strong>Why do I need to keep authorizing when calling services on this page?</strong> <br/> This page is a \"one-page-app\". Reloading the page resets the OAuth authorization context. There is generally no need to reload the page, so just don't do it and your authorization will persist.
  *
- * The version of the OpenAPI document: 1.162.3
+ * The version of the OpenAPI document: 2023.06.1
  * Contact: kontakt@finapi.io
  * Generated by: https://openapi-generator.tech
- * OpenAPI Generator version: 6.2.0
+ * OpenAPI Generator version: 6.1.0
  */
 
 /**
@@ -97,16 +97,16 @@ class MoneyTransferOrderingResponse implements ModelInterface, ArrayAccess, \Jso
       * @var boolean[]
       */
     protected static array $openAPINullables = [
-        'success_message' => false,
-		'warn_message' => false,
+        'success_message' => true,
+		'warn_message' => true,
 		'payment_id' => false,
-		'challenge_message' => false,
-		'answer_field_label' => false,
-		'tan_list_number' => false,
-		'optical_data' => false,
+		'challenge_message' => true,
+		'answer_field_label' => true,
+		'tan_list_number' => true,
+		'optical_data' => true,
 		'optical_data_as_reiner_sct' => false,
-		'photo_tan_mime_type' => false,
-		'photo_tan_data' => false
+		'photo_tan_mime_type' => true,
+		'photo_tan_data' => true
     ];
 
     /**
@@ -329,11 +329,35 @@ class MoneyTransferOrderingResponse implements ModelInterface, ArrayAccess, \Jso
     {
         $invalidProperties = [];
 
+        if ($this->container['success_message'] === null) {
+            $invalidProperties[] = "'success_message' can't be null";
+        }
+        if ($this->container['warn_message'] === null) {
+            $invalidProperties[] = "'warn_message' can't be null";
+        }
         if ($this->container['payment_id'] === null) {
             $invalidProperties[] = "'payment_id' can't be null";
         }
+        if ($this->container['challenge_message'] === null) {
+            $invalidProperties[] = "'challenge_message' can't be null";
+        }
+        if ($this->container['answer_field_label'] === null) {
+            $invalidProperties[] = "'answer_field_label' can't be null";
+        }
+        if ($this->container['tan_list_number'] === null) {
+            $invalidProperties[] = "'tan_list_number' can't be null";
+        }
+        if ($this->container['optical_data'] === null) {
+            $invalidProperties[] = "'optical_data' can't be null";
+        }
         if ($this->container['optical_data_as_reiner_sct'] === null) {
             $invalidProperties[] = "'optical_data_as_reiner_sct' can't be null";
+        }
+        if ($this->container['photo_tan_mime_type'] === null) {
+            $invalidProperties[] = "'photo_tan_mime_type' can't be null";
+        }
+        if ($this->container['photo_tan_data'] === null) {
+            $invalidProperties[] = "'photo_tan_data' can't be null";
         }
         return $invalidProperties;
     }
@@ -353,7 +377,7 @@ class MoneyTransferOrderingResponse implements ModelInterface, ArrayAccess, \Jso
     /**
      * Gets success_message
      *
-     * @return string|null
+     * @return string
      */
     public function getSuccessMessage()
     {
@@ -363,7 +387,7 @@ class MoneyTransferOrderingResponse implements ModelInterface, ArrayAccess, \Jso
     /**
      * Sets success_message
      *
-     * @param string|null $success_message Technical message from the bank server, confirming the success of the request. Typically, you would not want to present this message to the user. Note that this field may not be set. However if it is not set, it does not necessarily mean that there was an error in processing the request.
+     * @param string $success_message Technical message from the bank server, confirming the success of the request. Typically, you would not want to present this message to the user. Note that this field may not be set. However if it is not set, it does not necessarily mean that there was an error in processing the request.
      *
      * @return self
      */
@@ -371,7 +395,14 @@ class MoneyTransferOrderingResponse implements ModelInterface, ArrayAccess, \Jso
     {
 
         if (is_null($success_message)) {
-            throw new \InvalidArgumentException('non-nullable success_message cannot be null');
+            array_push($this->openAPINullablesSetToNull, 'success_message');
+        } else {
+            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
+            $index = array_search('success_message', $nullablesSetToNull);
+            if ($index !== FALSE) {
+                unset($nullablesSetToNull[$index]);
+                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
+            }
         }
 
         $this->container['success_message'] = $success_message;
@@ -382,7 +413,7 @@ class MoneyTransferOrderingResponse implements ModelInterface, ArrayAccess, \Jso
     /**
      * Gets warn_message
      *
-     * @return string|null
+     * @return string
      */
     public function getWarnMessage()
     {
@@ -392,7 +423,7 @@ class MoneyTransferOrderingResponse implements ModelInterface, ArrayAccess, \Jso
     /**
      * Sets warn_message
      *
-     * @param string|null $warn_message In some cases, a bank server may accept the requested order, but return a warn message. This message may be of technical nature, but could also be of interest to the user.
+     * @param string $warn_message In some cases, a bank server may accept the requested order, but return a warn message. This message may be of technical nature, but could also be of interest to the user.
      *
      * @return self
      */
@@ -400,7 +431,14 @@ class MoneyTransferOrderingResponse implements ModelInterface, ArrayAccess, \Jso
     {
 
         if (is_null($warn_message)) {
-            throw new \InvalidArgumentException('non-nullable warn_message cannot be null');
+            array_push($this->openAPINullablesSetToNull, 'warn_message');
+        } else {
+            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
+            $index = array_search('warn_message', $nullablesSetToNull);
+            if ($index !== FALSE) {
+                unset($nullablesSetToNull[$index]);
+                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
+            }
         }
 
         $this->container['warn_message'] = $warn_message;
@@ -440,7 +478,7 @@ class MoneyTransferOrderingResponse implements ModelInterface, ArrayAccess, \Jso
     /**
      * Gets challenge_message
      *
-     * @return string|null
+     * @return string
      */
     public function getChallengeMessage()
     {
@@ -450,7 +488,7 @@ class MoneyTransferOrderingResponse implements ModelInterface, ArrayAccess, \Jso
     /**
      * Sets challenge_message
      *
-     * @param string|null $challenge_message Message from the bank server containing information or instructions on how to retrieve the TAN that is needed to execute the requested order. This message should be presented to the user. Note that some bank servers may limit the message to just the most crucial information, e.g. the message may contain just a single number that depicts the target TAN number on a user's TAN list. You may want to parse the challenge message for such cases and extend it with more detailed information before showing it to the user.
+     * @param string $challenge_message Message from the bank server containing information or instructions on how to retrieve the TAN that is needed to execute the requested order. This message should be presented to the user. Note that some bank servers may limit the message to just the most crucial information, e.g. the message may contain just a single number that depicts the target TAN number on a user's TAN list. You may want to parse the challenge message for such cases and extend it with more detailed information before showing it to the user.
      *
      * @return self
      */
@@ -458,7 +496,14 @@ class MoneyTransferOrderingResponse implements ModelInterface, ArrayAccess, \Jso
     {
 
         if (is_null($challenge_message)) {
-            throw new \InvalidArgumentException('non-nullable challenge_message cannot be null');
+            array_push($this->openAPINullablesSetToNull, 'challenge_message');
+        } else {
+            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
+            $index = array_search('challenge_message', $nullablesSetToNull);
+            if ($index !== FALSE) {
+                unset($nullablesSetToNull[$index]);
+                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
+            }
         }
 
         $this->container['challenge_message'] = $challenge_message;
@@ -469,7 +514,7 @@ class MoneyTransferOrderingResponse implements ModelInterface, ArrayAccess, \Jso
     /**
      * Gets answer_field_label
      *
-     * @return string|null
+     * @return string
      */
     public function getAnswerFieldLabel()
     {
@@ -479,7 +524,7 @@ class MoneyTransferOrderingResponse implements ModelInterface, ArrayAccess, \Jso
     /**
      * Sets answer_field_label
      *
-     * @param string|null $answer_field_label Suggestion from the bank server on how you can label your input field where the user must enter his TAN. A typical value that many bank servers give is 'TAN-Nummer'.
+     * @param string $answer_field_label Suggestion from the bank server on how you can label your input field where the user must enter his TAN. A typical value that many bank servers give is 'TAN-Nummer'.
      *
      * @return self
      */
@@ -487,7 +532,14 @@ class MoneyTransferOrderingResponse implements ModelInterface, ArrayAccess, \Jso
     {
 
         if (is_null($answer_field_label)) {
-            throw new \InvalidArgumentException('non-nullable answer_field_label cannot be null');
+            array_push($this->openAPINullablesSetToNull, 'answer_field_label');
+        } else {
+            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
+            $index = array_search('answer_field_label', $nullablesSetToNull);
+            if ($index !== FALSE) {
+                unset($nullablesSetToNull[$index]);
+                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
+            }
         }
 
         $this->container['answer_field_label'] = $answer_field_label;
@@ -498,7 +550,7 @@ class MoneyTransferOrderingResponse implements ModelInterface, ArrayAccess, \Jso
     /**
      * Gets tan_list_number
      *
-     * @return string|null
+     * @return string
      */
     public function getTanListNumber()
     {
@@ -508,7 +560,7 @@ class MoneyTransferOrderingResponse implements ModelInterface, ArrayAccess, \Jso
     /**
      * Sets tan_list_number
      *
-     * @param string|null $tan_list_number In case that the bank server has instructed the user to look up a TAN from a TAN list, this field may contain the identification number of the TAN list. However in most cases, this field is only set (i.e. not null) when the user has multiple active TAN lists.
+     * @param string $tan_list_number In case that the bank server has instructed the user to look up a TAN from a TAN list, this field may contain the identification number of the TAN list. However in most cases, this field is only set (i.e. not null) when the user has multiple active TAN lists.
      *
      * @return self
      */
@@ -516,7 +568,14 @@ class MoneyTransferOrderingResponse implements ModelInterface, ArrayAccess, \Jso
     {
 
         if (is_null($tan_list_number)) {
-            throw new \InvalidArgumentException('non-nullable tan_list_number cannot be null');
+            array_push($this->openAPINullablesSetToNull, 'tan_list_number');
+        } else {
+            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
+            $index = array_search('tan_list_number', $nullablesSetToNull);
+            if ($index !== FALSE) {
+                unset($nullablesSetToNull[$index]);
+                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
+            }
         }
 
         $this->container['tan_list_number'] = $tan_list_number;
@@ -527,7 +586,7 @@ class MoneyTransferOrderingResponse implements ModelInterface, ArrayAccess, \Jso
     /**
      * Gets optical_data
      *
-     * @return string|null
+     * @return string
      */
     public function getOpticalData()
     {
@@ -537,7 +596,7 @@ class MoneyTransferOrderingResponse implements ModelInterface, ArrayAccess, \Jso
     /**
      * Sets optical_data
      *
-     * @param string|null $optical_data In case that the bank server has instructed the user to scan a flicker code, then this field will contain the raw data for the flicker animation as a BASE-64 string. Otherwise, this field will be not set (i.e. null). See also: <a href='https://documentation.finapi.io/access/Flicker-Code-Template.2807824454.html' target='_blank'>Flicker Code Template</a>
+     * @param string $optical_data In case that the bank server has instructed the user to scan a flicker code, then this field will contain the raw data for the flicker animation as a BASE-64 string. Otherwise, this field will be not set (i.e. null). See also: <a href='https://documentation.finapi.io/access/Flicker-Code-Template.2807824454.html' target='_blank'>Flicker Code Template</a>
      *
      * @return self
      */
@@ -545,7 +604,14 @@ class MoneyTransferOrderingResponse implements ModelInterface, ArrayAccess, \Jso
     {
 
         if (is_null($optical_data)) {
-            throw new \InvalidArgumentException('non-nullable optical_data cannot be null');
+            array_push($this->openAPINullablesSetToNull, 'optical_data');
+        } else {
+            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
+            $index = array_search('optical_data', $nullablesSetToNull);
+            if ($index !== FALSE) {
+                unset($nullablesSetToNull[$index]);
+                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
+            }
         }
 
         $this->container['optical_data'] = $optical_data;
@@ -585,7 +651,7 @@ class MoneyTransferOrderingResponse implements ModelInterface, ArrayAccess, \Jso
     /**
      * Gets photo_tan_mime_type
      *
-     * @return string|null
+     * @return string
      */
     public function getPhotoTanMimeType()
     {
@@ -595,7 +661,7 @@ class MoneyTransferOrderingResponse implements ModelInterface, ArrayAccess, \Jso
     /**
      * Sets photo_tan_mime_type
      *
-     * @param string|null $photo_tan_mime_type In case that the 'photoTanData' field is set (i.e. not null), this field contains the MIME type to use for interpreting the photo data (e.g.: 'image/png')
+     * @param string $photo_tan_mime_type In case that the 'photoTanData' field is set (i.e. not null), this field contains the MIME type to use for interpreting the photo data (e.g.: 'image/png')
      *
      * @return self
      */
@@ -603,7 +669,14 @@ class MoneyTransferOrderingResponse implements ModelInterface, ArrayAccess, \Jso
     {
 
         if (is_null($photo_tan_mime_type)) {
-            throw new \InvalidArgumentException('non-nullable photo_tan_mime_type cannot be null');
+            array_push($this->openAPINullablesSetToNull, 'photo_tan_mime_type');
+        } else {
+            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
+            $index = array_search('photo_tan_mime_type', $nullablesSetToNull);
+            if ($index !== FALSE) {
+                unset($nullablesSetToNull[$index]);
+                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
+            }
         }
 
         $this->container['photo_tan_mime_type'] = $photo_tan_mime_type;
@@ -614,7 +687,7 @@ class MoneyTransferOrderingResponse implements ModelInterface, ArrayAccess, \Jso
     /**
      * Gets photo_tan_data
      *
-     * @return string|null
+     * @return string
      */
     public function getPhotoTanData()
     {
@@ -624,7 +697,7 @@ class MoneyTransferOrderingResponse implements ModelInterface, ArrayAccess, \Jso
     /**
      * Sets photo_tan_data
      *
-     * @param string|null $photo_tan_data In case that the bank server has instructed the user to scan a photo (or more generally speaking, any kind of QR-code-like data), then this field will contain the raw data of the photo as a BASE-64 string. Otherwise, this field will be not set (i.e. null).
+     * @param string $photo_tan_data In case that the bank server has instructed the user to scan a photo (or more generally speaking, any kind of QR-code-like data), then this field will contain the raw data of the photo as a BASE-64 string. Otherwise, this field will be not set (i.e. null).
      *
      * @return self
      */
@@ -632,7 +705,14 @@ class MoneyTransferOrderingResponse implements ModelInterface, ArrayAccess, \Jso
     {
 
         if (is_null($photo_tan_data)) {
-            throw new \InvalidArgumentException('non-nullable photo_tan_data cannot be null');
+            array_push($this->openAPINullablesSetToNull, 'photo_tan_data');
+        } else {
+            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
+            $index = array_search('photo_tan_data', $nullablesSetToNull);
+            if ($index !== FALSE) {
+                unset($nullablesSetToNull[$index]);
+                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
+            }
         }
 
         $this->container['photo_tan_data'] = $photo_tan_data;
