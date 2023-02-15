@@ -11,14 +11,14 @@
  */
 
 /**
- * finAPI Access
+ * finAPI Access V1 (deprecated)
  *
- * <strong>RESTful API for Account Information Services (AIS) and Payment Initiation Services (PIS)</strong>  The following pages give you some general information on how to use our APIs.<br/> The actual API services documentation then follows further below. You can use the menu to jump between API sections. <br/> <br/> This page has a built-in HTTP(S) client, so you can test the services directly from within this page, by filling in the request parameters and/or body in the respective services, and then hitting the TRY button. Note that you need to be authorized to make a successful API call. To authorize, refer to the 'Authorization' section of the API, or just use the OAUTH button that can be found near the TRY button. <br/>  <h2 id=\"general-information\">General information</h2>  <h3 id=\"general-error-responses\"><strong>Error Responses</strong></h3> When an API call returns with an error, then in general it has the structure shown in the following example:  <pre> {   \"errors\": [     {       \"message\": \"Interface 'FINTS_SERVER' is not supported for this operation.\",       \"code\": \"BAD_REQUEST\",       \"type\": \"TECHNICAL\"     }   ],   \"date\": \"2020-11-19 16:54:06.854\",   \"requestId\": \"selfgen-312042e7-df55-47e4-bffd-956a68ef37b5\",   \"endpoint\": \"POST /api/v1/bankConnections/import\",   \"authContext\": \"1/21\",   \"bank\": \"DEMO0002 - finAPI Test Redirect Bank\" } </pre>  If an API call requires an additional authentication by the user, HTTP code 510 is returned and the error response contains the additional \"multiStepAuthentication\" object, see the following example:  <pre> {   \"errors\": [     {       \"message\": \"Es ist eine zusätzliche Authentifizierung erforderlich. Bitte geben Sie folgenden Code an: 123456\",       \"code\": \"ADDITIONAL_AUTHENTICATION_REQUIRED\",       \"type\": \"BUSINESS\",       \"multiStepAuthentication\": {         \"hash\": \"678b13f4be9ed7d981a840af8131223a\",         \"status\": \"CHALLENGE_RESPONSE_REQUIRED\",         \"challengeMessage\": \"Es ist eine zusätzliche Authentifizierung erforderlich. Bitte geben Sie folgenden Code an: 123456\",         \"answerFieldLabel\": \"TAN\",         \"redirectUrl\": null,         \"redirectContext\": null,         \"redirectContextField\": null,         \"twoStepProcedures\": null,         \"photoTanMimeType\": null,         \"photoTanData\": null,         \"opticalData\": null,         \"opticalDataAsReinerSct\": false       }     }   ],   \"date\": \"2019-11-29 09:51:55.931\",   \"requestId\": \"selfgen-45059c99-1b14-4df7-9bd3-9d5f126df294\",   \"endpoint\": \"POST /api/v1/bankConnections/import\",   \"authContext\": \"1/18\",   \"bank\": \"DEMO0001 - finAPI Test Bank\" } </pre>  An exception to this error format are API authentication errors, where the following structure is returned:  <pre> {   \"error\": \"invalid_token\",   \"error_description\": \"Invalid access token: cccbce46-xxxx-xxxx-xxxx-xxxxxxxxxx\" } </pre>  <h3 id=\"general-paging\"><strong>Paging</strong></h3> API services that may potentially return a lot of data implement paging. They return a limited number of entries within a \"page\". Further entries must be fetched with subsequent calls. <br/><br/> Any API service that implements paging provides the following input parameters:<br/> &bull; \"page\": the number of the page to be retrieved (starting with 1).<br/> &bull; \"perPage\": the number of entries within a page. The default and maximum value is stated in the documentation of the respective services.  A paged response contains an additional \"paging\" object with the following structure:  <pre> {   ...   ,   \"paging\": {     \"page\": 1,     \"perPage\": 20,     \"pageCount\": 234,     \"totalCount\": 4662   } } </pre>  <h3 id=\"general-internationalization\"><strong>Internationalization</strong></h3> The finAPI services support internationalization which means you can define the language you prefer for API service responses. <br/><br/> The following languages are available: German, English, Czech, Slovak. <br/><br/> The preferred language can be defined by providing the official HTTP <strong>Accept-Language</strong> header. <br/><br/> finAPI reacts on the official iso language codes &quot;de&quot;, &quot;en&quot;, &quot;cs&quot; and &quot;sk&quot; for the named languages. Additional subtags supported by the Accept-Language header may be provided, e.g. &quot;en-US&quot;, but are ignored. <br/> If no Accept-Language header is given, German is used as the default language. <br/><br/> Exceptions:<br/> &bull; Bank login hints and login fields are only available in the language of the bank and not being translated.<br/> &bull; Direct messages from the bank systems typically returned as BUSINESS errors will not be translated.<br/> &bull; BUSINESS errors created by finAPI directly are available in German and English.<br/> &bull; TECHNICAL errors messages meant for developers are mostly in English, but also may be translated.  <h3 id=\"general-request-ids\"><strong>Request IDs</strong></h3> With any API call, you can pass a request ID via a header with name \"X-Request-Id\". The request ID can be an arbitrary string with up to 255 characters. Passing a longer string will result in an error. <br/><br/> If you don't pass a request ID for a call, finAPI will generate a random ID internally. <br/><br/> The request ID is always returned back in the response of a service, as a header with name \"X-Request-Id\". <br/><br/> We highly recommend to always pass a (preferably unique) request ID, and include it into your client application logs whenever you make a request or receive a response (especially in the case of an error response). finAPI is also logging request IDs on its end. Having a request ID can help the finAPI support team to work more efficiently and solve tickets faster.  <h3 id=\"general-overriding-http-methods\"><strong>Overriding HTTP methods</strong></h3> Some HTTP clients do not support the HTTP methods PATCH or DELETE. If you are using such a client in your application, you can use a POST request instead with a special HTTP header indicating the originally intended HTTP method. <br/><br/> The header's name is <strong>X-HTTP-Method-Override</strong>. Set its value to either <strong>PATCH</strong> or <strong>DELETE</strong>. POST Requests having this header set will be treated either as PATCH or DELETE by the finAPI servers. <br/><br/> Example: <br/><br/> <strong>X-HTTP-Method-Override: PATCH</strong><br/> POST /api/v1/label/51<br/> {\"name\": \"changed label\"}<br/><br/> will be interpreted by finAPI as:<br/><br/> PATCH /api/v1/label/51<br/> {\"name\": \"changed label\"}<br/>  <h3 id=\"general-user-metadata\"><strong>User metadata</strong></h3> With the migration to PSD2 APIs, a new term called \"User metadata\" (also known as \"PSU metadata\") has been introduced to the API. This user metadata aims to inform the banking API if there was a real end-user behind an HTTP request or if the request was triggered by a system (e.g. by an automatic batch update). In the latter case, the bank may apply some restrictions such as limiting the number of HTTP requests for a single consent. Also, some operations may be forbidden entirely by the banking API. For example, some banks do not allow issuing a new consent without the end-user being involved. Therefore, it is certainly necessary and obligatory for the customer to provide the PSU metadata for such operations. <br/><br/> As finAPI does not have direct interaction with the end-user, it is the client application's responsibility to provide all the necessary information about the end-user. This must be done by sending additional headers with every request triggered on behalf of the end-user. <br/><br/> At the moment, the following headers are supported by the API:<br/> &bull; \"PSU-IP-Address\" - the IP address of the user's device.<br/> &bull; \"PSU-Device-OS\" - the user's device and/or operating system identification.<br/> &bull; \"PSU-User-Agent\" - the user's web browser or other client device identification.  <h3 id=\"general-faq\"><strong>FAQ</strong></h3> <strong>Is there a finAPI SDK?</strong> <br/> Currently we do not offer a native SDK, but there is the option to generate an SDK for almost any target language via OpenAPI. Use the 'Download SDK' button on this page for SDK generation. <br/> <br/> <strong>How can I enable finAPI's automatic batch update?</strong> <br/> Currently there is no way to set up the batch update via the API. Please contact support@finapi.io for this. <br/> <br/> <strong>Why do I need to keep authorizing when calling services on this page?</strong> <br/> This page is a \"one-page-app\". Reloading the page resets the OAuth authorization context. There is generally no need to reload the page, so just don't do it and your authorization will persist.
+ * <strong>RESTful API for Account Information Services (AIS) and Payment Initiation Services (PIS)</strong> <br/> <strong>Application Version:</strong> 2.7.0 <br/>  The following pages give you some general information on how to use our APIs.<br/> The actual API services documentation then follows further below. You can use the menu to jump between API sections. <br/> <br/> This page has a built-in HTTP(S) client, so you can test the services directly from within this page, by filling in the request parameters and/or body in the respective services, and then hitting the TRY button. Note that you need to be authorized to make a successful API call. To authorize, refer to the 'Authorization' section of the API, or just use the OAUTH button that can be found near the TRY button. <br/>  <h2 id=\"general-information\">General information</h2>  <h3 id=\"general-error-responses\"><strong>Error Responses</strong></h3> When an API call returns with an error, then in general it has the structure shown in the following example:  <pre> {   \"errors\": [     {       \"message\": \"Interface 'FINTS_SERVER' is not supported for this operation.\",       \"code\": \"BAD_REQUEST\",       \"type\": \"TECHNICAL\"     }   ],   \"date\": \"2020-11-19 16:54:06.854\",   \"requestId\": \"selfgen-312042e7-df55-47e4-bffd-956a68ef37b5\",   \"endpoint\": \"POST /api/v1/bankConnections/import\",   \"authContext\": \"1/21\",   \"bank\": \"DEMO0002 - finAPI Test Redirect Bank\" } </pre>  If an API call requires an additional authentication by the user, HTTP code 510 is returned and the error response contains the additional \"multiStepAuthentication\" object, see the following example:  <pre> {   \"errors\": [     {       \"message\": \"Es ist eine zusätzliche Authentifizierung erforderlich. Bitte geben Sie folgenden Code an: 123456\",       \"code\": \"ADDITIONAL_AUTHENTICATION_REQUIRED\",       \"type\": \"BUSINESS\",       \"multiStepAuthentication\": {         \"hash\": \"678b13f4be9ed7d981a840af8131223a\",         \"status\": \"CHALLENGE_RESPONSE_REQUIRED\",         \"challengeMessage\": \"Es ist eine zusätzliche Authentifizierung erforderlich. Bitte geben Sie folgenden Code an: 123456\",         \"answerFieldLabel\": \"TAN\",         \"redirectUrl\": null,         \"redirectContext\": null,         \"redirectContextField\": null,         \"twoStepProcedures\": null,         \"photoTanMimeType\": null,         \"photoTanData\": null,         \"opticalData\": null,         \"opticalDataAsReinerSct\": false       }     }   ],   \"date\": \"2019-11-29 09:51:55.931\",   \"requestId\": \"selfgen-45059c99-1b14-4df7-9bd3-9d5f126df294\",   \"endpoint\": \"POST /api/v1/bankConnections/import\",   \"authContext\": \"1/18\",   \"bank\": \"DEMO0001 - finAPI Test Bank\" } </pre>  An exception to this error format are API authentication errors, where the following structure is returned:  <pre> {   \"error\": \"invalid_token\",   \"error_description\": \"Invalid access token: cccbce46-xxxx-xxxx-xxxx-xxxxxxxxxx\" } </pre>  <h3 id=\"general-paging\"><strong>Paging</strong></h3> API services that may potentially return a lot of data implement paging. They return a limited number of entries within a \"page\". Further entries must be fetched with subsequent calls. <br/><br/> Any API service that implements paging provides the following input parameters:<br/> &bull; \"page\": the number of the page to be retrieved (starting with 1).<br/> &bull; \"perPage\": the number of entries within a page. The default and maximum value is stated in the documentation of the respective services.  A paged response contains an additional \"paging\" object with the following structure:  <pre> {   ...   ,   \"paging\": {     \"page\": 1,     \"perPage\": 20,     \"pageCount\": 234,     \"totalCount\": 4662   } } </pre>  <h3 id=\"general-internationalization\"><strong>Internationalization</strong></h3> The finAPI services support internationalization which means you can define the language you prefer for API service responses. <br/><br/> The following languages are available: German, English, Czech, Slovak. <br/><br/> The preferred language can be defined by providing the official HTTP <strong>Accept-Language</strong> header. <br/><br/> finAPI reacts on the official iso language codes &quot;de&quot;, &quot;en&quot;, &quot;cs&quot; and &quot;sk&quot; for the named languages. Additional subtags supported by the Accept-Language header may be provided, e.g. &quot;en-US&quot;, but are ignored. <br/> If no Accept-Language header is given, German is used as the default language. <br/><br/> Exceptions:<br/> &bull; Bank login hints and login fields are only available in the language of the bank and not being translated.<br/> &bull; Direct messages from the bank systems typically returned as BUSINESS errors will not be translated.<br/> &bull; BUSINESS errors created by finAPI directly are available in German and English.<br/> &bull; TECHNICAL errors messages meant for developers are mostly in English, but also may be translated.  <h3 id=\"general-request-ids\"><strong>Request IDs</strong></h3> With any API call, you can pass a request ID via a header with name \"X-Request-Id\". The request ID can be an arbitrary string with up to 255 characters. Passing a longer string will result in an error. <br/><br/> If you don't pass a request ID for a call, finAPI will generate a random ID internally. <br/><br/> The request ID is always returned back in the response of a service, as a header with name \"X-Request-Id\". <br/><br/> We highly recommend to always pass a (preferably unique) request ID, and include it into your client application logs whenever you make a request or receive a response (especially in the case of an error response). finAPI is also logging request IDs on its end. Having a request ID can help the finAPI support team to work more efficiently and solve tickets faster.  <h3 id=\"general-overriding-http-methods\"><strong>Overriding HTTP methods</strong></h3> Some HTTP clients do not support the HTTP methods PATCH or DELETE. If you are using such a client in your application, you can use a POST request instead with a special HTTP header indicating the originally intended HTTP method. <br/><br/> The header's name is <strong>X-HTTP-Method-Override</strong>. Set its value to either <strong>PATCH</strong> or <strong>DELETE</strong>. POST Requests having this header set will be treated either as PATCH or DELETE by the finAPI servers. <br/><br/> Example: <br/><br/> <strong>X-HTTP-Method-Override: PATCH</strong><br/> POST /api/v1/label/51<br/> {\"name\": \"changed label\"}<br/><br/> will be interpreted by finAPI as:<br/><br/> PATCH /api/v1/label/51<br/> {\"name\": \"changed label\"}<br/>  <h3 id=\"general-user-metadata\"><strong>User metadata</strong></h3> With the migration to PSD2 APIs, a new term called \"User metadata\" (also known as \"PSU metadata\") has been introduced to the API. This user metadata aims to inform the banking API if there was a real end-user behind an HTTP request or if the request was triggered by a system (e.g. by an automatic batch update). In the latter case, the bank may apply some restrictions such as limiting the number of HTTP requests for a single consent. Also, some operations may be forbidden entirely by the banking API. For example, some banks do not allow issuing a new consent without the end-user being involved. Therefore, it is certainly necessary and obligatory for the customer to provide the PSU metadata for such operations. <br/><br/> As finAPI does not have direct interaction with the end-user, it is the client application's responsibility to provide all the necessary information about the end-user. This must be done by sending additional headers with every request triggered on behalf of the end-user. <br/><br/> At the moment, the following headers are supported by the API:<br/> &bull; \"PSU-IP-Address\" - the IP address of the user's device.<br/> &bull; \"PSU-Device-OS\" - the user's device and/or operating system identification.<br/> &bull; \"PSU-User-Agent\" - the user's web browser or other client device identification.  <h3 id=\"general-faq\"><strong>FAQ</strong></h3> <strong>Is there a finAPI SDK?</strong> <br/> Currently we do not offer a native SDK, but there is the option to generate an SDK for almost any target language via OpenAPI. Use the 'Download SDK' button on this page for SDK generation. <br/> <br/> <strong>How can I enable finAPI's automatic batch update?</strong> <br/> Currently there is no way to set up the batch update via the API. Please contact support@finapi.io for this. <br/> <br/> <strong>Why do I need to keep authorizing when calling services on this page?</strong> <br/> This page is a \"one-page-app\". Reloading the page resets the OAuth authorization context. There is generally no need to reload the page, so just don't do it and your authorization will persist.
  *
- * The version of the OpenAPI document: 1.162.3
+ * The version of the OpenAPI document: 2023.06.1
  * Contact: kontakt@finapi.io
  * Generated by: https://openapi-generator.tech
- * OpenAPI Generator version: 6.2.0
+ * OpenAPI Generator version: 6.1.0
  */
 
 /**
@@ -76,16 +76,24 @@ class ClientConfiguration implements ModelInterface, ArrayAccess, \JsonSerializa
         'is_user_auto_verification_enabled' => 'bool',
         'is_mandator_admin' => 'bool',
         'is_web_scraping_enabled' => 'bool',
+        'is_xs2a_enabled' => 'bool',
+        'pin_storage_available_in_web_form' => 'bool',
         'payments_enabled' => 'bool',
         'is_standalone_payments_enabled' => 'bool',
         'available_bank_groups' => 'string[]',
         'products' => 'Product[]',
+        'application_name' => 'string',
         'fin_ts_product_registration_number' => 'string',
+        'store_secrets_available_in_web_form' => 'bool',
+        'support_subject_default' => 'string',
+        'support_email' => 'string',
         'ais_web_form_mode' => 'WebFormMode',
         'pis_web_form_mode' => 'WebFormMode',
         'pis_standalone_web_form_mode' => 'WebFormMode',
         'beta_banks_enabled' => 'bool',
+        'category_restrictions_enabled' => 'bool',
         'category_restrictions' => '\OpenAPIAccess\Client\Model\Category[]',
+        'auto_dismount_web_form' => 'bool',
         'cors_allowed_origins' => 'string[]'
     ];
 
@@ -114,16 +122,24 @@ class ClientConfiguration implements ModelInterface, ArrayAccess, \JsonSerializa
         'is_user_auto_verification_enabled' => null,
         'is_mandator_admin' => null,
         'is_web_scraping_enabled' => null,
+        'is_xs2a_enabled' => null,
+        'pin_storage_available_in_web_form' => null,
         'payments_enabled' => null,
         'is_standalone_payments_enabled' => null,
         'available_bank_groups' => null,
         'products' => null,
+        'application_name' => null,
         'fin_ts_product_registration_number' => null,
+        'store_secrets_available_in_web_form' => null,
+        'support_subject_default' => null,
+        'support_email' => null,
         'ais_web_form_mode' => null,
         'pis_web_form_mode' => null,
         'pis_standalone_web_form_mode' => null,
         'beta_banks_enabled' => null,
+        'category_restrictions_enabled' => null,
         'category_restrictions' => null,
+        'auto_dismount_web_form' => null,
         'cors_allowed_origins' => null
     ];
 
@@ -150,16 +166,24 @@ class ClientConfiguration implements ModelInterface, ArrayAccess, \JsonSerializa
 		'is_user_auto_verification_enabled' => false,
 		'is_mandator_admin' => false,
 		'is_web_scraping_enabled' => false,
+		'is_xs2a_enabled' => false,
+		'pin_storage_available_in_web_form' => false,
 		'payments_enabled' => false,
 		'is_standalone_payments_enabled' => false,
 		'available_bank_groups' => false,
 		'products' => false,
+		'application_name' => true,
 		'fin_ts_product_registration_number' => true,
+		'store_secrets_available_in_web_form' => false,
+		'support_subject_default' => true,
+		'support_email' => true,
 		'ais_web_form_mode' => false,
 		'pis_web_form_mode' => false,
 		'pis_standalone_web_form_mode' => false,
 		'beta_banks_enabled' => false,
-		'category_restrictions' => true,
+		'category_restrictions_enabled' => false,
+		'category_restrictions' => false,
+		'auto_dismount_web_form' => false,
 		'cors_allowed_origins' => true
     ];
 
@@ -256,16 +280,24 @@ class ClientConfiguration implements ModelInterface, ArrayAccess, \JsonSerializa
         'is_user_auto_verification_enabled' => 'isUserAutoVerificationEnabled',
         'is_mandator_admin' => 'isMandatorAdmin',
         'is_web_scraping_enabled' => 'isWebScrapingEnabled',
+        'is_xs2a_enabled' => 'isXs2aEnabled',
+        'pin_storage_available_in_web_form' => 'pinStorageAvailableInWebForm',
         'payments_enabled' => 'paymentsEnabled',
         'is_standalone_payments_enabled' => 'isStandalonePaymentsEnabled',
         'available_bank_groups' => 'availableBankGroups',
         'products' => 'products',
+        'application_name' => 'applicationName',
         'fin_ts_product_registration_number' => 'finTSProductRegistrationNumber',
+        'store_secrets_available_in_web_form' => 'storeSecretsAvailableInWebForm',
+        'support_subject_default' => 'supportSubjectDefault',
+        'support_email' => 'supportEmail',
         'ais_web_form_mode' => 'aisWebFormMode',
         'pis_web_form_mode' => 'pisWebFormMode',
         'pis_standalone_web_form_mode' => 'pisStandaloneWebFormMode',
         'beta_banks_enabled' => 'betaBanksEnabled',
+        'category_restrictions_enabled' => 'categoryRestrictionsEnabled',
         'category_restrictions' => 'categoryRestrictions',
+        'auto_dismount_web_form' => 'autoDismountWebForm',
         'cors_allowed_origins' => 'corsAllowedOrigins'
     ];
 
@@ -292,16 +324,24 @@ class ClientConfiguration implements ModelInterface, ArrayAccess, \JsonSerializa
         'is_user_auto_verification_enabled' => 'setIsUserAutoVerificationEnabled',
         'is_mandator_admin' => 'setIsMandatorAdmin',
         'is_web_scraping_enabled' => 'setIsWebScrapingEnabled',
+        'is_xs2a_enabled' => 'setIsXs2aEnabled',
+        'pin_storage_available_in_web_form' => 'setPinStorageAvailableInWebForm',
         'payments_enabled' => 'setPaymentsEnabled',
         'is_standalone_payments_enabled' => 'setIsStandalonePaymentsEnabled',
         'available_bank_groups' => 'setAvailableBankGroups',
         'products' => 'setProducts',
+        'application_name' => 'setApplicationName',
         'fin_ts_product_registration_number' => 'setFinTsProductRegistrationNumber',
+        'store_secrets_available_in_web_form' => 'setStoreSecretsAvailableInWebForm',
+        'support_subject_default' => 'setSupportSubjectDefault',
+        'support_email' => 'setSupportEmail',
         'ais_web_form_mode' => 'setAisWebFormMode',
         'pis_web_form_mode' => 'setPisWebFormMode',
         'pis_standalone_web_form_mode' => 'setPisStandaloneWebFormMode',
         'beta_banks_enabled' => 'setBetaBanksEnabled',
+        'category_restrictions_enabled' => 'setCategoryRestrictionsEnabled',
         'category_restrictions' => 'setCategoryRestrictions',
+        'auto_dismount_web_form' => 'setAutoDismountWebForm',
         'cors_allowed_origins' => 'setCorsAllowedOrigins'
     ];
 
@@ -328,16 +368,24 @@ class ClientConfiguration implements ModelInterface, ArrayAccess, \JsonSerializa
         'is_user_auto_verification_enabled' => 'getIsUserAutoVerificationEnabled',
         'is_mandator_admin' => 'getIsMandatorAdmin',
         'is_web_scraping_enabled' => 'getIsWebScrapingEnabled',
+        'is_xs2a_enabled' => 'getIsXs2aEnabled',
+        'pin_storage_available_in_web_form' => 'getPinStorageAvailableInWebForm',
         'payments_enabled' => 'getPaymentsEnabled',
         'is_standalone_payments_enabled' => 'getIsStandalonePaymentsEnabled',
         'available_bank_groups' => 'getAvailableBankGroups',
         'products' => 'getProducts',
+        'application_name' => 'getApplicationName',
         'fin_ts_product_registration_number' => 'getFinTsProductRegistrationNumber',
+        'store_secrets_available_in_web_form' => 'getStoreSecretsAvailableInWebForm',
+        'support_subject_default' => 'getSupportSubjectDefault',
+        'support_email' => 'getSupportEmail',
         'ais_web_form_mode' => 'getAisWebFormMode',
         'pis_web_form_mode' => 'getPisWebFormMode',
         'pis_standalone_web_form_mode' => 'getPisStandaloneWebFormMode',
         'beta_banks_enabled' => 'getBetaBanksEnabled',
+        'category_restrictions_enabled' => 'getCategoryRestrictionsEnabled',
         'category_restrictions' => 'getCategoryRestrictions',
+        'auto_dismount_web_form' => 'getAutoDismountWebForm',
         'cors_allowed_origins' => 'getCorsAllowedOrigins'
     ];
 
@@ -415,16 +463,24 @@ class ClientConfiguration implements ModelInterface, ArrayAccess, \JsonSerializa
         $this->setIfExists('is_user_auto_verification_enabled', $data ?? [], null);
         $this->setIfExists('is_mandator_admin', $data ?? [], null);
         $this->setIfExists('is_web_scraping_enabled', $data ?? [], null);
+        $this->setIfExists('is_xs2a_enabled', $data ?? [], null);
+        $this->setIfExists('pin_storage_available_in_web_form', $data ?? [], null);
         $this->setIfExists('payments_enabled', $data ?? [], null);
         $this->setIfExists('is_standalone_payments_enabled', $data ?? [], null);
         $this->setIfExists('available_bank_groups', $data ?? [], null);
         $this->setIfExists('products', $data ?? [], null);
+        $this->setIfExists('application_name', $data ?? [], null);
         $this->setIfExists('fin_ts_product_registration_number', $data ?? [], null);
+        $this->setIfExists('store_secrets_available_in_web_form', $data ?? [], null);
+        $this->setIfExists('support_subject_default', $data ?? [], null);
+        $this->setIfExists('support_email', $data ?? [], null);
         $this->setIfExists('ais_web_form_mode', $data ?? [], null);
         $this->setIfExists('pis_web_form_mode', $data ?? [], null);
         $this->setIfExists('pis_standalone_web_form_mode', $data ?? [], null);
         $this->setIfExists('beta_banks_enabled', $data ?? [], null);
+        $this->setIfExists('category_restrictions_enabled', $data ?? [], null);
         $this->setIfExists('category_restrictions', $data ?? [], null);
+        $this->setIfExists('auto_dismount_web_form', $data ?? [], null);
         $this->setIfExists('cors_allowed_origins', $data ?? [], null);
     }
 
@@ -506,6 +562,12 @@ class ClientConfiguration implements ModelInterface, ArrayAccess, \JsonSerializa
         if ($this->container['is_web_scraping_enabled'] === null) {
             $invalidProperties[] = "'is_web_scraping_enabled' can't be null";
         }
+        if ($this->container['is_xs2a_enabled'] === null) {
+            $invalidProperties[] = "'is_xs2a_enabled' can't be null";
+        }
+        if ($this->container['pin_storage_available_in_web_form'] === null) {
+            $invalidProperties[] = "'pin_storage_available_in_web_form' can't be null";
+        }
         if ($this->container['payments_enabled'] === null) {
             $invalidProperties[] = "'payments_enabled' can't be null";
         }
@@ -518,8 +580,20 @@ class ClientConfiguration implements ModelInterface, ArrayAccess, \JsonSerializa
         if ($this->container['products'] === null) {
             $invalidProperties[] = "'products' can't be null";
         }
+        if ($this->container['application_name'] === null) {
+            $invalidProperties[] = "'application_name' can't be null";
+        }
         if ($this->container['fin_ts_product_registration_number'] === null) {
             $invalidProperties[] = "'fin_ts_product_registration_number' can't be null";
+        }
+        if ($this->container['store_secrets_available_in_web_form'] === null) {
+            $invalidProperties[] = "'store_secrets_available_in_web_form' can't be null";
+        }
+        if ($this->container['support_subject_default'] === null) {
+            $invalidProperties[] = "'support_subject_default' can't be null";
+        }
+        if ($this->container['support_email'] === null) {
+            $invalidProperties[] = "'support_email' can't be null";
         }
         if ($this->container['ais_web_form_mode'] === null) {
             $invalidProperties[] = "'ais_web_form_mode' can't be null";
@@ -533,8 +607,14 @@ class ClientConfiguration implements ModelInterface, ArrayAccess, \JsonSerializa
         if ($this->container['beta_banks_enabled'] === null) {
             $invalidProperties[] = "'beta_banks_enabled' can't be null";
         }
+        if ($this->container['category_restrictions_enabled'] === null) {
+            $invalidProperties[] = "'category_restrictions_enabled' can't be null";
+        }
         if ($this->container['category_restrictions'] === null) {
             $invalidProperties[] = "'category_restrictions' can't be null";
+        }
+        if ($this->container['auto_dismount_web_form'] === null) {
+            $invalidProperties[] = "'auto_dismount_web_form' can't be null";
         }
         if ($this->container['cors_allowed_origins'] === null) {
             $invalidProperties[] = "'cors_allowed_origins' can't be null";
@@ -741,7 +821,7 @@ class ClientConfiguration implements ModelInterface, ArrayAccess, \JsonSerializa
     /**
      * Sets preferred_consent_type
      *
-     * @param PreferredConsentType $preferred_consent_type <strong>Type:</strong> PreferredConsentType<br/> The preferred consent type that will be used for the XS2A interface.<br/><br/><b>ONETIME</b> - The consent can only be used once to download data associated with the account. The consent won’t be saved by finAPI.<br/><b>RECURRING</b> - The consent is valid for up to 90 days and can be used by finAPI to access and download account data for up to 4 times per day.<br/><br/>NOTE: If the bank does not support the preferred consent type, then finAPI will default to the other type.
+     * @param PreferredConsentType $preferred_consent_type <strong>Type:</strong> PreferredConsentType<br/> The preferred consent type that will be used for the XS2A interface.<br/><br/>&bull; <b>ONETIME</b> - The consent can only be used once to download data associated with the account. The consent won’t be saved by finAPI.<br/>&bull; <b>RECURRING</b> - The consent is valid for up to 90 days and can be used by finAPI to access and download account data for up to 4 times per day.<br/><br/>NOTE: If the bank does not support the preferred consent type, then finAPI will default to the other type.
      *
      * @return self
      */
@@ -958,7 +1038,7 @@ class ClientConfiguration implements ModelInterface, ArrayAccess, \JsonSerializa
     /**
      * Sets transaction_import_limitation
      *
-     * @param int $transaction_import_limitation This setting defines the upper limit of how much of an account's transactions history may be downloaded whenever a new account is imported, across all of your users. More technically, it depicts the maximum number of days for which transactions might get downloaded, starting from - and including - the date of the account import. '0' means that there is no limitation.
+     * @param int $transaction_import_limitation This setting defines the upper limit of how much of an account's transactions history may get downloaded whenever a new account is imported, across all of your users. More technically, it depicts the maximum number of days for which transactions might get downloaded, starting from - and including - the date of the account import. '0' means that there is no limitation.
      *
      * @return self
      */
@@ -1057,6 +1137,64 @@ class ClientConfiguration implements ModelInterface, ArrayAccess, \JsonSerializa
         }
 
         $this->container['is_web_scraping_enabled'] = $is_web_scraping_enabled;
+
+        return $this;
+    }
+
+    /**
+     * Gets is_xs2a_enabled
+     *
+     * @return bool
+     */
+    public function getIsXs2aEnabled()
+    {
+        return $this->container['is_xs2a_enabled'];
+    }
+
+    /**
+     * Sets is_xs2a_enabled
+     *
+     * @param bool $is_xs2a_enabled THIS FIELD IS DEPRECATED AND WILL BE REMOVED.<br/><br/>Whether this client is allowed to access XS2A services.
+     *
+     * @return self
+     */
+    public function setIsXs2aEnabled($is_xs2a_enabled)
+    {
+
+        if (is_null($is_xs2a_enabled)) {
+            throw new \InvalidArgumentException('non-nullable is_xs2a_enabled cannot be null');
+        }
+
+        $this->container['is_xs2a_enabled'] = $is_xs2a_enabled;
+
+        return $this;
+    }
+
+    /**
+     * Gets pin_storage_available_in_web_form
+     *
+     * @return bool
+     */
+    public function getPinStorageAvailableInWebForm()
+    {
+        return $this->container['pin_storage_available_in_web_form'];
+    }
+
+    /**
+     * Sets pin_storage_available_in_web_form
+     *
+     * @param bool $pin_storage_available_in_web_form THIS FIELD IS DEPRECATED AND WILL BE REMOVED.<br/>Please refer to the 'storeSecretsAvailableInWebForm' field instead.<br/><br/>Whether finAPI's Web Form will provide a checkbox for the user allowing him to choose whether to store his banking PIN in finAPI. If this field is set to false, then the user won't have an option to store his PIN.
+     *
+     * @return self
+     */
+    public function setPinStorageAvailableInWebForm($pin_storage_available_in_web_form)
+    {
+
+        if (is_null($pin_storage_available_in_web_form)) {
+            throw new \InvalidArgumentException('non-nullable pin_storage_available_in_web_form cannot be null');
+        }
+
+        $this->container['pin_storage_available_in_web_form'] = $pin_storage_available_in_web_form;
 
         return $this;
     }
@@ -1180,6 +1318,42 @@ class ClientConfiguration implements ModelInterface, ArrayAccess, \JsonSerializa
     }
 
     /**
+     * Gets application_name
+     *
+     * @return string
+     */
+    public function getApplicationName()
+    {
+        return $this->container['application_name'];
+    }
+
+    /**
+     * Sets application_name
+     *
+     * @param string $application_name THIS FIELD IS DEPRECATED AND WILL BE REMOVED.<br/>Please refer <a href='?product=web_form_2.0#post-/api/profiles' target='_blank'>here</a> to the 'logo' and 'favicon' field instead. The Web Form will now be able to render your logo both in the header and as a favicon.<br/><br/>Application name. When an application name is set (e.g. \"My App\"), then finAPI's Web Form will display a text to the user \"Weiterleitung auf finAPI von ...\" (e.g. \"Weiterleitung auf finAPI von MyApp\").
+     *
+     * @return self
+     */
+    public function setApplicationName($application_name)
+    {
+
+        if (is_null($application_name)) {
+            array_push($this->openAPINullablesSetToNull, 'application_name');
+        } else {
+            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
+            $index = array_search('application_name', $nullablesSetToNull);
+            if ($index !== FALSE) {
+                unset($nullablesSetToNull[$index]);
+                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
+            }
+        }
+
+        $this->container['application_name'] = $application_name;
+
+        return $this;
+    }
+
+    /**
      * Gets fin_ts_product_registration_number
      *
      * @return string
@@ -1211,6 +1385,107 @@ class ClientConfiguration implements ModelInterface, ArrayAccess, \JsonSerializa
         }
 
         $this->container['fin_ts_product_registration_number'] = $fin_ts_product_registration_number;
+
+        return $this;
+    }
+
+    /**
+     * Gets store_secrets_available_in_web_form
+     *
+     * @return bool
+     */
+    public function getStoreSecretsAvailableInWebForm()
+    {
+        return $this->container['store_secrets_available_in_web_form'];
+    }
+
+    /**
+     * Sets store_secrets_available_in_web_form
+     *
+     * @param bool $store_secrets_available_in_web_form THIS FIELD IS DEPRECATED AND WILL BE REMOVED.<br/>Please refer <a href='?product=web_form_2.0#post-/api/profiles' target='_blank'>here</a> to the 'storeSecrets' field instead.<br/><br/>Whether finAPI's Web Form should provide a checkbox for the user allowing him to choose whether to store his banking PIN in finAPI. If this field is set to false, then the user won't have an option to store his PIN.
+     *
+     * @return self
+     */
+    public function setStoreSecretsAvailableInWebForm($store_secrets_available_in_web_form)
+    {
+
+        if (is_null($store_secrets_available_in_web_form)) {
+            throw new \InvalidArgumentException('non-nullable store_secrets_available_in_web_form cannot be null');
+        }
+
+        $this->container['store_secrets_available_in_web_form'] = $store_secrets_available_in_web_form;
+
+        return $this;
+    }
+
+    /**
+     * Gets support_subject_default
+     *
+     * @return string
+     */
+    public function getSupportSubjectDefault()
+    {
+        return $this->container['support_subject_default'];
+    }
+
+    /**
+     * Sets support_subject_default
+     *
+     * @param string $support_subject_default THIS FIELD IS DEPRECATED AND WILL BE REMOVED.<br/>Please refer <a href='https://documentation.finapi.io/webform/For-best-results!.2477654019.html' target='_blank'>here</a> to the 'errorRedirectUrl' and 'customerSupportUrl' query parameters instead.<br/><br/>Default value for the subject element of support emails.
+     *
+     * @return self
+     */
+    public function setSupportSubjectDefault($support_subject_default)
+    {
+
+        if (is_null($support_subject_default)) {
+            array_push($this->openAPINullablesSetToNull, 'support_subject_default');
+        } else {
+            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
+            $index = array_search('support_subject_default', $nullablesSetToNull);
+            if ($index !== FALSE) {
+                unset($nullablesSetToNull[$index]);
+                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
+            }
+        }
+
+        $this->container['support_subject_default'] = $support_subject_default;
+
+        return $this;
+    }
+
+    /**
+     * Gets support_email
+     *
+     * @return string
+     */
+    public function getSupportEmail()
+    {
+        return $this->container['support_email'];
+    }
+
+    /**
+     * Sets support_email
+     *
+     * @param string $support_email THIS FIELD IS DEPRECATED AND WILL BE REMOVED.<br/>Please refer <a href='https://documentation.finapi.io/webform/For-best-results!.2477654019.html' target='_blank'>here</a> to the 'errorRedirectUrl' and 'customerSupportUrl' query parameters instead.<br/><br/>Email address to sent support requests to from the Web Form.
+     *
+     * @return self
+     */
+    public function setSupportEmail($support_email)
+    {
+
+        if (is_null($support_email)) {
+            array_push($this->openAPINullablesSetToNull, 'support_email');
+        } else {
+            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
+            $index = array_search('support_email', $nullablesSetToNull);
+            if ($index !== FALSE) {
+                unset($nullablesSetToNull[$index]);
+                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
+            }
+        }
+
+        $this->container['support_email'] = $support_email;
 
         return $this;
     }
@@ -1332,6 +1607,35 @@ class ClientConfiguration implements ModelInterface, ArrayAccess, \JsonSerializa
     }
 
     /**
+     * Gets category_restrictions_enabled
+     *
+     * @return bool
+     */
+    public function getCategoryRestrictionsEnabled()
+    {
+        return $this->container['category_restrictions_enabled'];
+    }
+
+    /**
+     * Sets category_restrictions_enabled
+     *
+     * @param bool $category_restrictions_enabled Whether category restrictions are applied to your client. If true, transaction access is restricted to the categories contained in the ‘categoryRestrictions’ list. If false, then there are no restrictions for your client, and you may retrieve the full set of imported transactions.
+     *
+     * @return self
+     */
+    public function setCategoryRestrictionsEnabled($category_restrictions_enabled)
+    {
+
+        if (is_null($category_restrictions_enabled)) {
+            throw new \InvalidArgumentException('non-nullable category_restrictions_enabled cannot be null');
+        }
+
+        $this->container['category_restrictions_enabled'] = $category_restrictions_enabled;
+
+        return $this;
+    }
+
+    /**
      * Gets category_restrictions
      *
      * @return \OpenAPIAccess\Client\Model\Category[]
@@ -1344,7 +1648,7 @@ class ClientConfiguration implements ModelInterface, ArrayAccess, \JsonSerializa
     /**
      * Sets category_restrictions
      *
-     * @param \OpenAPIAccess\Client\Model\Category[] $category_restrictions <strong>Type:</strong> Category<br/> Defines the set of transaction categories to which your client is restricted. When retrieving transactions (via the GET /transactions services), you may request only those transactions whose 'category' is one of the listed categories. If this field is null, then there are no restrictions for your client, and you may retrieve the full set of imported transactions.
+     * @param \OpenAPIAccess\Client\Model\Category[] $category_restrictions <strong>Type:</strong> Category<br/> Defines the set of transaction categories to which your client is restricted. This field is only relevant if the 'categoryRestrictionsEnabled' flag is set to true. In this case, when retrieving transactions (via the GET /transactions services), you may request only those transactions whose 'category' is one of the listed categories. If the set is empty, you won’t be able to access any transactions.
      *
      * @return self
      */
@@ -1352,17 +1656,39 @@ class ClientConfiguration implements ModelInterface, ArrayAccess, \JsonSerializa
     {
 
         if (is_null($category_restrictions)) {
-            array_push($this->openAPINullablesSetToNull, 'category_restrictions');
-        } else {
-            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
-            $index = array_search('category_restrictions', $nullablesSetToNull);
-            if ($index !== FALSE) {
-                unset($nullablesSetToNull[$index]);
-                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
-            }
+            throw new \InvalidArgumentException('non-nullable category_restrictions cannot be null');
         }
 
         $this->container['category_restrictions'] = $category_restrictions;
+
+        return $this;
+    }
+
+    /**
+     * Gets auto_dismount_web_form
+     *
+     * @return bool
+     */
+    public function getAutoDismountWebForm()
+    {
+        return $this->container['auto_dismount_web_form'];
+    }
+
+    /**
+     * Sets auto_dismount_web_form
+     *
+     * @param bool $auto_dismount_web_form THIS FIELD IS DEPRECATED AND WILL BE REMOVED.<br/> Please refer <a href='?product=web_form_2.0#post-/api/profiles' target='_blank'>here</a> to the 'skipConfirmationView' field instead.<br/><br/>This flag indicates whether the Web Form should get removed from the parent page automatically once it’s finished. It applies ONLY to the classical embedded Web Form. That means it’s only applied if aisWebFormMode, pisWebFormMode or pisStandaloneWebFormMode are defined as INTERNAL. In case you are using our standalone Web Form by redirecting the user to our Web Form link, this feature has no effect.
+     *
+     * @return self
+     */
+    public function setAutoDismountWebForm($auto_dismount_web_form)
+    {
+
+        if (is_null($auto_dismount_web_form)) {
+            throw new \InvalidArgumentException('non-nullable auto_dismount_web_form cannot be null');
+        }
+
+        $this->container['auto_dismount_web_form'] = $auto_dismount_web_form;
 
         return $this;
     }
