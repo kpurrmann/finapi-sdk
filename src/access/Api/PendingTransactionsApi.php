@@ -1,6 +1,6 @@
 <?php
 /**
- * AuthorizationApi
+ * PendingTransactionsApi
  * PHP version 7.4
  *
  * @category Class
@@ -41,14 +41,14 @@ use OpenAPIAccess\Client\HeaderSelector;
 use OpenAPIAccess\Client\ObjectSerializer;
 
 /**
- * AuthorizationApi Class Doc Comment
+ * PendingTransactionsApi Class Doc Comment
  *
  * @category Class
  * @package  OpenAPIAccess\Client
  * @author   OpenAPI Generator team
  * @link     https://openapi-generator.tech
  */
-class AuthorizationApi
+class PendingTransactionsApi
 {
     /**
      * @var ClientInterface
@@ -117,48 +117,46 @@ class AuthorizationApi
     }
 
     /**
-     * Operation getToken
+     * Operation getAndSearchAllPendingTransactions
      *
-     * Get tokens
+     * Get and search all pending transactions
      *
-     * @param  string $grant_type Determines the required type of authorization:password - authorize a user; client_credentials - authorize a client;refresh_token - refresh a user&#39;s access_token. (required)
-     * @param  string $client_id Client identifier (required)
-     * @param  string $client_secret Client secret (required)
+     * @param  int[] $ids A comma-separated list of pending transaction identifiers. If specified, then only pending transactions whose identifier match any of the given identifiers will be regarded. The maximum number of identifiers is 1000. (optional)
+     * @param  int[] $account_ids A comma-separated list of account identifiers. If specified, then only pending transactions that relate to the given accounts will be regarded. If not specified, then all accounts will be regarded. (optional)
+     * @param  int $page Result page that you want to retrieve. (optional, default to 1)
+     * @param  int $per_page Maximum number of records per page. By default it&#39;s 20. Can be at most 500. (optional, default to 20)
+     * @param  string[] $order Determines the order of the results. You can use the following fields for ordering the response: &#39;id&#39;, &#39;accountId&#39;, &#39;valueDate&#39;, &#39;bankBookingDate&#39;, &#39;importDate&#39; and &#39;amount&#39;. The default order for all services is &#39;id,asc&#39;. You can also order by multiple properties. In that case the order of the parameters passed is important. Example: &#39;/pendingTransactions?order&#x3D;valueDate,desc&amp;order&#x3D;counterpartyName&#39; will return the latest pending transactions first. If there are more pending transactions on the same day, then these pending transactions are ordered by the counterparty name (ascending). The general format is: &#39;property[,asc|desc]&#39;, with &#39;asc&#39; being the default value. (optional)
      * @param  string $x_request_id With any API call, you can pass a request ID. The request ID can be an arbitrary string with up to 255 characters. Passing a longer string will result in an error. If you don&#39;t pass a request ID for a call, finAPI will generate a random ID internally. The request ID is always returned back in the response of a service, as a header with name &#39;X-Request-Id&#39;. We highly recommend to always pass a (preferably unique) request ID, and include it into your client application logs whenever you make a request or receive a response (especially in the case of an error response). finAPI is also logging request IDs on its end. Having a request ID can help the finAPI support team to work more efficiently and solve tickets faster. (optional)
-     * @param  string $refresh_token Refresh token. Required for grant_type&#x3D;refresh_token only. (optional)
-     * @param  string $username User identifier. Required for grant_type&#x3D;password only. (optional)
-     * @param  string $password User password. Required for grant_type&#x3D;password only. (optional)
      *
      * @throws \OpenAPIAccess\Client\ApiException on non-2xx response
      * @throws \InvalidArgumentException
-     * @return \OpenAPIAccess\Client\Model\AccessToken|\OpenAPIAccess\Client\Model\ErrorMessage|\OpenAPIAccess\Client\Model\BadCredentialsError|\OpenAPIAccess\Client\Model\ErrorMessage|\OpenAPIAccess\Client\Model\ErrorMessage|\OpenAPIAccess\Client\Model\ErrorMessage
+     * @return \OpenAPIAccess\Client\Model\PageablePendingTransactionResources|\OpenAPIAccess\Client\Model\ErrorMessage|\OpenAPIAccess\Client\Model\BadCredentialsError|\OpenAPIAccess\Client\Model\ErrorMessage|\OpenAPIAccess\Client\Model\ErrorMessage
      */
-    public function getToken($grant_type, $client_id, $client_secret, $x_request_id = null, $refresh_token = null, $username = null, $password = null)
+    public function getAndSearchAllPendingTransactions($ids = null, $account_ids = null, $page = 1, $per_page = 20, $order = null, $x_request_id = null)
     {
-        list($response) = $this->getTokenWithHttpInfo($grant_type, $client_id, $client_secret, $x_request_id, $refresh_token, $username, $password);
+        list($response) = $this->getAndSearchAllPendingTransactionsWithHttpInfo($ids, $account_ids, $page, $per_page, $order, $x_request_id);
         return $response;
     }
 
     /**
-     * Operation getTokenWithHttpInfo
+     * Operation getAndSearchAllPendingTransactionsWithHttpInfo
      *
-     * Get tokens
+     * Get and search all pending transactions
      *
-     * @param  string $grant_type Determines the required type of authorization:password - authorize a user; client_credentials - authorize a client;refresh_token - refresh a user&#39;s access_token. (required)
-     * @param  string $client_id Client identifier (required)
-     * @param  string $client_secret Client secret (required)
+     * @param  int[] $ids A comma-separated list of pending transaction identifiers. If specified, then only pending transactions whose identifier match any of the given identifiers will be regarded. The maximum number of identifiers is 1000. (optional)
+     * @param  int[] $account_ids A comma-separated list of account identifiers. If specified, then only pending transactions that relate to the given accounts will be regarded. If not specified, then all accounts will be regarded. (optional)
+     * @param  int $page Result page that you want to retrieve. (optional, default to 1)
+     * @param  int $per_page Maximum number of records per page. By default it&#39;s 20. Can be at most 500. (optional, default to 20)
+     * @param  string[] $order Determines the order of the results. You can use the following fields for ordering the response: &#39;id&#39;, &#39;accountId&#39;, &#39;valueDate&#39;, &#39;bankBookingDate&#39;, &#39;importDate&#39; and &#39;amount&#39;. The default order for all services is &#39;id,asc&#39;. You can also order by multiple properties. In that case the order of the parameters passed is important. Example: &#39;/pendingTransactions?order&#x3D;valueDate,desc&amp;order&#x3D;counterpartyName&#39; will return the latest pending transactions first. If there are more pending transactions on the same day, then these pending transactions are ordered by the counterparty name (ascending). The general format is: &#39;property[,asc|desc]&#39;, with &#39;asc&#39; being the default value. (optional)
      * @param  string $x_request_id With any API call, you can pass a request ID. The request ID can be an arbitrary string with up to 255 characters. Passing a longer string will result in an error. If you don&#39;t pass a request ID for a call, finAPI will generate a random ID internally. The request ID is always returned back in the response of a service, as a header with name &#39;X-Request-Id&#39;. We highly recommend to always pass a (preferably unique) request ID, and include it into your client application logs whenever you make a request or receive a response (especially in the case of an error response). finAPI is also logging request IDs on its end. Having a request ID can help the finAPI support team to work more efficiently and solve tickets faster. (optional)
-     * @param  string $refresh_token Refresh token. Required for grant_type&#x3D;refresh_token only. (optional)
-     * @param  string $username User identifier. Required for grant_type&#x3D;password only. (optional)
-     * @param  string $password User password. Required for grant_type&#x3D;password only. (optional)
      *
      * @throws \OpenAPIAccess\Client\ApiException on non-2xx response
      * @throws \InvalidArgumentException
-     * @return array of \OpenAPIAccess\Client\Model\AccessToken|\OpenAPIAccess\Client\Model\ErrorMessage|\OpenAPIAccess\Client\Model\BadCredentialsError|\OpenAPIAccess\Client\Model\ErrorMessage|\OpenAPIAccess\Client\Model\ErrorMessage|\OpenAPIAccess\Client\Model\ErrorMessage, HTTP status code, HTTP response headers (array of strings)
+     * @return array of \OpenAPIAccess\Client\Model\PageablePendingTransactionResources|\OpenAPIAccess\Client\Model\ErrorMessage|\OpenAPIAccess\Client\Model\BadCredentialsError|\OpenAPIAccess\Client\Model\ErrorMessage|\OpenAPIAccess\Client\Model\ErrorMessage, HTTP status code, HTTP response headers (array of strings)
      */
-    public function getTokenWithHttpInfo($grant_type, $client_id, $client_secret, $x_request_id = null, $refresh_token = null, $username = null, $password = null)
+    public function getAndSearchAllPendingTransactionsWithHttpInfo($ids = null, $account_ids = null, $page = 1, $per_page = 20, $order = null, $x_request_id = null)
     {
-        $request = $this->getTokenRequest($grant_type, $client_id, $client_secret, $x_request_id, $refresh_token, $username, $password);
+        $request = $this->getAndSearchAllPendingTransactionsRequest($ids, $account_ids, $page, $per_page, $order, $x_request_id);
 
         try {
             $options = $this->createHttpClientOption();
@@ -197,17 +195,17 @@ class AuthorizationApi
 
             switch($statusCode) {
                 case 200:
-                    if ('\OpenAPIAccess\Client\Model\AccessToken' === '\SplFileObject') {
+                    if ('\OpenAPIAccess\Client\Model\PageablePendingTransactionResources' === '\SplFileObject') {
                         $content = $response->getBody(); //stream goes to serializer
                     } else {
                         $content = (string) $response->getBody();
-                        if ('\OpenAPIAccess\Client\Model\AccessToken' !== 'string') {
+                        if ('\OpenAPIAccess\Client\Model\PageablePendingTransactionResources' !== 'string') {
                             $content = json_decode($content);
                         }
                     }
 
                     return [
-                        ObjectSerializer::deserialize($content, '\OpenAPIAccess\Client\Model\AccessToken', []),
+                        ObjectSerializer::deserialize($content, '\OpenAPIAccess\Client\Model\PageablePendingTransactionResources', []),
                         $response->getStatusCode(),
                         $response->getHeaders()
                     ];
@@ -256,21 +254,6 @@ class AuthorizationApi
                         $response->getStatusCode(),
                         $response->getHeaders()
                     ];
-                case 423:
-                    if ('\OpenAPIAccess\Client\Model\ErrorMessage' === '\SplFileObject') {
-                        $content = $response->getBody(); //stream goes to serializer
-                    } else {
-                        $content = (string) $response->getBody();
-                        if ('\OpenAPIAccess\Client\Model\ErrorMessage' !== 'string') {
-                            $content = json_decode($content);
-                        }
-                    }
-
-                    return [
-                        ObjectSerializer::deserialize($content, '\OpenAPIAccess\Client\Model\ErrorMessage', []),
-                        $response->getStatusCode(),
-                        $response->getHeaders()
-                    ];
                 case 500:
                     if ('\OpenAPIAccess\Client\Model\ErrorMessage' === '\SplFileObject') {
                         $content = $response->getBody(); //stream goes to serializer
@@ -288,7 +271,7 @@ class AuthorizationApi
                     ];
             }
 
-            $returnType = '\OpenAPIAccess\Client\Model\AccessToken';
+            $returnType = '\OpenAPIAccess\Client\Model\PageablePendingTransactionResources';
             if ($returnType === '\SplFileObject') {
                 $content = $response->getBody(); //stream goes to serializer
             } else {
@@ -309,7 +292,7 @@ class AuthorizationApi
                 case 200:
                     $data = ObjectSerializer::deserialize(
                         $e->getResponseBody(),
-                        '\OpenAPIAccess\Client\Model\AccessToken',
+                        '\OpenAPIAccess\Client\Model\PageablePendingTransactionResources',
                         $e->getResponseHeaders()
                     );
                     $e->setResponseObject($data);
@@ -338,14 +321,6 @@ class AuthorizationApi
                     );
                     $e->setResponseObject($data);
                     break;
-                case 423:
-                    $data = ObjectSerializer::deserialize(
-                        $e->getResponseBody(),
-                        '\OpenAPIAccess\Client\Model\ErrorMessage',
-                        $e->getResponseHeaders()
-                    );
-                    $e->setResponseObject($data);
-                    break;
                 case 500:
                     $data = ObjectSerializer::deserialize(
                         $e->getResponseBody(),
@@ -360,24 +335,23 @@ class AuthorizationApi
     }
 
     /**
-     * Operation getTokenAsync
+     * Operation getAndSearchAllPendingTransactionsAsync
      *
-     * Get tokens
+     * Get and search all pending transactions
      *
-     * @param  string $grant_type Determines the required type of authorization:password - authorize a user; client_credentials - authorize a client;refresh_token - refresh a user&#39;s access_token. (required)
-     * @param  string $client_id Client identifier (required)
-     * @param  string $client_secret Client secret (required)
+     * @param  int[] $ids A comma-separated list of pending transaction identifiers. If specified, then only pending transactions whose identifier match any of the given identifiers will be regarded. The maximum number of identifiers is 1000. (optional)
+     * @param  int[] $account_ids A comma-separated list of account identifiers. If specified, then only pending transactions that relate to the given accounts will be regarded. If not specified, then all accounts will be regarded. (optional)
+     * @param  int $page Result page that you want to retrieve. (optional, default to 1)
+     * @param  int $per_page Maximum number of records per page. By default it&#39;s 20. Can be at most 500. (optional, default to 20)
+     * @param  string[] $order Determines the order of the results. You can use the following fields for ordering the response: &#39;id&#39;, &#39;accountId&#39;, &#39;valueDate&#39;, &#39;bankBookingDate&#39;, &#39;importDate&#39; and &#39;amount&#39;. The default order for all services is &#39;id,asc&#39;. You can also order by multiple properties. In that case the order of the parameters passed is important. Example: &#39;/pendingTransactions?order&#x3D;valueDate,desc&amp;order&#x3D;counterpartyName&#39; will return the latest pending transactions first. If there are more pending transactions on the same day, then these pending transactions are ordered by the counterparty name (ascending). The general format is: &#39;property[,asc|desc]&#39;, with &#39;asc&#39; being the default value. (optional)
      * @param  string $x_request_id With any API call, you can pass a request ID. The request ID can be an arbitrary string with up to 255 characters. Passing a longer string will result in an error. If you don&#39;t pass a request ID for a call, finAPI will generate a random ID internally. The request ID is always returned back in the response of a service, as a header with name &#39;X-Request-Id&#39;. We highly recommend to always pass a (preferably unique) request ID, and include it into your client application logs whenever you make a request or receive a response (especially in the case of an error response). finAPI is also logging request IDs on its end. Having a request ID can help the finAPI support team to work more efficiently and solve tickets faster. (optional)
-     * @param  string $refresh_token Refresh token. Required for grant_type&#x3D;refresh_token only. (optional)
-     * @param  string $username User identifier. Required for grant_type&#x3D;password only. (optional)
-     * @param  string $password User password. Required for grant_type&#x3D;password only. (optional)
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function getTokenAsync($grant_type, $client_id, $client_secret, $x_request_id = null, $refresh_token = null, $username = null, $password = null)
+    public function getAndSearchAllPendingTransactionsAsync($ids = null, $account_ids = null, $page = 1, $per_page = 20, $order = null, $x_request_id = null)
     {
-        return $this->getTokenAsyncWithHttpInfo($grant_type, $client_id, $client_secret, $x_request_id, $refresh_token, $username, $password)
+        return $this->getAndSearchAllPendingTransactionsAsyncWithHttpInfo($ids, $account_ids, $page, $per_page, $order, $x_request_id)
             ->then(
                 function ($response) {
                     return $response[0];
@@ -386,25 +360,24 @@ class AuthorizationApi
     }
 
     /**
-     * Operation getTokenAsyncWithHttpInfo
+     * Operation getAndSearchAllPendingTransactionsAsyncWithHttpInfo
      *
-     * Get tokens
+     * Get and search all pending transactions
      *
-     * @param  string $grant_type Determines the required type of authorization:password - authorize a user; client_credentials - authorize a client;refresh_token - refresh a user&#39;s access_token. (required)
-     * @param  string $client_id Client identifier (required)
-     * @param  string $client_secret Client secret (required)
+     * @param  int[] $ids A comma-separated list of pending transaction identifiers. If specified, then only pending transactions whose identifier match any of the given identifiers will be regarded. The maximum number of identifiers is 1000. (optional)
+     * @param  int[] $account_ids A comma-separated list of account identifiers. If specified, then only pending transactions that relate to the given accounts will be regarded. If not specified, then all accounts will be regarded. (optional)
+     * @param  int $page Result page that you want to retrieve. (optional, default to 1)
+     * @param  int $per_page Maximum number of records per page. By default it&#39;s 20. Can be at most 500. (optional, default to 20)
+     * @param  string[] $order Determines the order of the results. You can use the following fields for ordering the response: &#39;id&#39;, &#39;accountId&#39;, &#39;valueDate&#39;, &#39;bankBookingDate&#39;, &#39;importDate&#39; and &#39;amount&#39;. The default order for all services is &#39;id,asc&#39;. You can also order by multiple properties. In that case the order of the parameters passed is important. Example: &#39;/pendingTransactions?order&#x3D;valueDate,desc&amp;order&#x3D;counterpartyName&#39; will return the latest pending transactions first. If there are more pending transactions on the same day, then these pending transactions are ordered by the counterparty name (ascending). The general format is: &#39;property[,asc|desc]&#39;, with &#39;asc&#39; being the default value. (optional)
      * @param  string $x_request_id With any API call, you can pass a request ID. The request ID can be an arbitrary string with up to 255 characters. Passing a longer string will result in an error. If you don&#39;t pass a request ID for a call, finAPI will generate a random ID internally. The request ID is always returned back in the response of a service, as a header with name &#39;X-Request-Id&#39;. We highly recommend to always pass a (preferably unique) request ID, and include it into your client application logs whenever you make a request or receive a response (especially in the case of an error response). finAPI is also logging request IDs on its end. Having a request ID can help the finAPI support team to work more efficiently and solve tickets faster. (optional)
-     * @param  string $refresh_token Refresh token. Required for grant_type&#x3D;refresh_token only. (optional)
-     * @param  string $username User identifier. Required for grant_type&#x3D;password only. (optional)
-     * @param  string $password User password. Required for grant_type&#x3D;password only. (optional)
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function getTokenAsyncWithHttpInfo($grant_type, $client_id, $client_secret, $x_request_id = null, $refresh_token = null, $username = null, $password = null)
+    public function getAndSearchAllPendingTransactionsAsyncWithHttpInfo($ids = null, $account_ids = null, $page = 1, $per_page = 20, $order = null, $x_request_id = null)
     {
-        $returnType = '\OpenAPIAccess\Client\Model\AccessToken';
-        $request = $this->getTokenRequest($grant_type, $client_id, $client_secret, $x_request_id, $refresh_token, $username, $password);
+        $returnType = '\OpenAPIAccess\Client\Model\PageablePendingTransactionResources';
+        $request = $this->getAndSearchAllPendingTransactionsRequest($ids, $account_ids, $page, $per_page, $order, $x_request_id);
 
         return $this->client
             ->sendAsync($request, $this->createHttpClientOption())
@@ -443,54 +416,90 @@ class AuthorizationApi
     }
 
     /**
-     * Create request for operation 'getToken'
+     * Create request for operation 'getAndSearchAllPendingTransactions'
      *
-     * @param  string $grant_type Determines the required type of authorization:password - authorize a user; client_credentials - authorize a client;refresh_token - refresh a user&#39;s access_token. (required)
-     * @param  string $client_id Client identifier (required)
-     * @param  string $client_secret Client secret (required)
+     * @param  int[] $ids A comma-separated list of pending transaction identifiers. If specified, then only pending transactions whose identifier match any of the given identifiers will be regarded. The maximum number of identifiers is 1000. (optional)
+     * @param  int[] $account_ids A comma-separated list of account identifiers. If specified, then only pending transactions that relate to the given accounts will be regarded. If not specified, then all accounts will be regarded. (optional)
+     * @param  int $page Result page that you want to retrieve. (optional, default to 1)
+     * @param  int $per_page Maximum number of records per page. By default it&#39;s 20. Can be at most 500. (optional, default to 20)
+     * @param  string[] $order Determines the order of the results. You can use the following fields for ordering the response: &#39;id&#39;, &#39;accountId&#39;, &#39;valueDate&#39;, &#39;bankBookingDate&#39;, &#39;importDate&#39; and &#39;amount&#39;. The default order for all services is &#39;id,asc&#39;. You can also order by multiple properties. In that case the order of the parameters passed is important. Example: &#39;/pendingTransactions?order&#x3D;valueDate,desc&amp;order&#x3D;counterpartyName&#39; will return the latest pending transactions first. If there are more pending transactions on the same day, then these pending transactions are ordered by the counterparty name (ascending). The general format is: &#39;property[,asc|desc]&#39;, with &#39;asc&#39; being the default value. (optional)
      * @param  string $x_request_id With any API call, you can pass a request ID. The request ID can be an arbitrary string with up to 255 characters. Passing a longer string will result in an error. If you don&#39;t pass a request ID for a call, finAPI will generate a random ID internally. The request ID is always returned back in the response of a service, as a header with name &#39;X-Request-Id&#39;. We highly recommend to always pass a (preferably unique) request ID, and include it into your client application logs whenever you make a request or receive a response (especially in the case of an error response). finAPI is also logging request IDs on its end. Having a request ID can help the finAPI support team to work more efficiently and solve tickets faster. (optional)
-     * @param  string $refresh_token Refresh token. Required for grant_type&#x3D;refresh_token only. (optional)
-     * @param  string $username User identifier. Required for grant_type&#x3D;password only. (optional)
-     * @param  string $password User password. Required for grant_type&#x3D;password only. (optional)
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Psr7\Request
      */
-    public function getTokenRequest($grant_type, $client_id, $client_secret, $x_request_id = null, $refresh_token = null, $username = null, $password = null)
+    public function getAndSearchAllPendingTransactionsRequest($ids = null, $account_ids = null, $page = 1, $per_page = 20, $order = null, $x_request_id = null)
     {
 
-        // verify the required parameter 'grant_type' is set
-        if ($grant_type === null || (is_array($grant_type) && count($grant_type) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $grant_type when calling getToken'
-            );
+
+
+        if ($page !== null && $page < 1) {
+            throw new \InvalidArgumentException('invalid value for "$page" when calling PendingTransactionsApi.getAndSearchAllPendingTransactions, must be bigger than or equal to 1.');
         }
 
-        // verify the required parameter 'client_id' is set
-        if ($client_id === null || (is_array($client_id) && count($client_id) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $client_id when calling getToken'
-            );
-        }
 
-        // verify the required parameter 'client_secret' is set
-        if ($client_secret === null || (is_array($client_secret) && count($client_secret) === 0)) {
-            throw new \InvalidArgumentException(
-                'Missing the required parameter $client_secret when calling getToken'
-            );
+        if ($per_page !== null && $per_page > 500) {
+            throw new \InvalidArgumentException('invalid value for "$per_page" when calling PendingTransactionsApi.getAndSearchAllPendingTransactions, must be smaller than or equal to 500.');
+        }
+        if ($per_page !== null && $per_page < 1) {
+            throw new \InvalidArgumentException('invalid value for "$per_page" when calling PendingTransactionsApi.getAndSearchAllPendingTransactions, must be bigger than or equal to 1.');
         }
 
 
 
 
-
-        $resourcePath = '/api/v2/oauth/token';
+        $resourcePath = '/api/v2/pendingTransactions';
         $formParams = [];
         $queryParams = [];
         $headerParams = [];
         $httpBody = '';
         $multipart = false;
 
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $ids,
+            'ids', // param base name
+            'array', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $account_ids,
+            'accountIds', // param base name
+            'array', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $page,
+            'page', // param base name
+            'integer', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $per_page,
+            'perPage', // param base name
+            'integer', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
+        // query params
+        $queryParams = array_merge($queryParams, ObjectSerializer::toQueryValue(
+            $order,
+            'order', // param base name
+            'array', // openApiType
+            'form', // style
+            true, // explode
+            false // required
+        ) ?? []);
 
         // header params
         if ($x_request_id !== null) {
@@ -498,30 +507,6 @@ class AuthorizationApi
         }
 
 
-        // form params
-        if ($grant_type !== null) {
-            $formParams['grant_type'] = ObjectSerializer::toFormValue($grant_type);
-        }
-        // form params
-        if ($client_id !== null) {
-            $formParams['client_id'] = ObjectSerializer::toFormValue($client_id);
-        }
-        // form params
-        if ($client_secret !== null) {
-            $formParams['client_secret'] = ObjectSerializer::toFormValue($client_secret);
-        }
-        // form params
-        if ($refresh_token !== null) {
-            $formParams['refresh_token'] = ObjectSerializer::toFormValue($refresh_token);
-        }
-        // form params
-        if ($username !== null) {
-            $formParams['username'] = ObjectSerializer::toFormValue($username);
-        }
-        // form params
-        if ($password !== null) {
-            $formParams['password'] = ObjectSerializer::toFormValue($password);
-        }
 
         if ($multipart) {
             $headers = $this->headerSelector->selectHeadersForMultipart(
@@ -530,7 +515,7 @@ class AuthorizationApi
         } else {
             $headers = $this->headerSelector->selectHeaders(
                 ['application/json'],
-                ['application/x-www-form-urlencoded']
+                []
             );
         }
 
@@ -559,6 +544,14 @@ class AuthorizationApi
             }
         }
 
+        // this endpoint requires OAuth (access token)
+        if (!empty($this->config->getAccessToken())) {
+            $headers['Authorization'] = 'Bearer ' . $this->config->getAccessToken();
+        }
+        // this endpoint requires OAuth (access token)
+        if (!empty($this->config->getAccessToken())) {
+            $headers['Authorization'] = 'Bearer ' . $this->config->getAccessToken();
+        }
 
         $defaultHeaders = [];
         if ($this->config->getUserAgent()) {
@@ -574,7 +567,7 @@ class AuthorizationApi
         $operationHost = $this->config->getHost();
         $query = ObjectSerializer::buildQuery($queryParams);
         return new Request(
-            'POST',
+            'GET',
             $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
             $headers,
             $httpBody
@@ -582,39 +575,38 @@ class AuthorizationApi
     }
 
     /**
-     * Operation revokeToken
+     * Operation getPendingTransaction
      *
-     * Revoke a token
+     * Get a pending transaction
      *
-     * @param  string $token The token that the client wants to get revoked (required)
+     * @param  int $id Identifier of pending transaction (required)
      * @param  string $x_request_id With any API call, you can pass a request ID. The request ID can be an arbitrary string with up to 255 characters. Passing a longer string will result in an error. If you don&#39;t pass a request ID for a call, finAPI will generate a random ID internally. The request ID is always returned back in the response of a service, as a header with name &#39;X-Request-Id&#39;. We highly recommend to always pass a (preferably unique) request ID, and include it into your client application logs whenever you make a request or receive a response (especially in the case of an error response). finAPI is also logging request IDs on its end. Having a request ID can help the finAPI support team to work more efficiently and solve tickets faster. (optional)
-     * @param  string $token_type_hint A hint about the type of the token submitted for revocation (optional)
      *
      * @throws \OpenAPIAccess\Client\ApiException on non-2xx response
      * @throws \InvalidArgumentException
-     * @return void
+     * @return \OpenAPIAccess\Client\Model\PendingTransaction|\OpenAPIAccess\Client\Model\ErrorMessage|\OpenAPIAccess\Client\Model\BadCredentialsError|\OpenAPIAccess\Client\Model\ErrorMessage|\OpenAPIAccess\Client\Model\ErrorMessage|\OpenAPIAccess\Client\Model\ErrorMessage
      */
-    public function revokeToken($token, $x_request_id = null, $token_type_hint = null)
+    public function getPendingTransaction($id, $x_request_id = null)
     {
-        $this->revokeTokenWithHttpInfo($token, $x_request_id, $token_type_hint);
+        list($response) = $this->getPendingTransactionWithHttpInfo($id, $x_request_id);
+        return $response;
     }
 
     /**
-     * Operation revokeTokenWithHttpInfo
+     * Operation getPendingTransactionWithHttpInfo
      *
-     * Revoke a token
+     * Get a pending transaction
      *
-     * @param  string $token The token that the client wants to get revoked (required)
+     * @param  int $id Identifier of pending transaction (required)
      * @param  string $x_request_id With any API call, you can pass a request ID. The request ID can be an arbitrary string with up to 255 characters. Passing a longer string will result in an error. If you don&#39;t pass a request ID for a call, finAPI will generate a random ID internally. The request ID is always returned back in the response of a service, as a header with name &#39;X-Request-Id&#39;. We highly recommend to always pass a (preferably unique) request ID, and include it into your client application logs whenever you make a request or receive a response (especially in the case of an error response). finAPI is also logging request IDs on its end. Having a request ID can help the finAPI support team to work more efficiently and solve tickets faster. (optional)
-     * @param  string $token_type_hint A hint about the type of the token submitted for revocation (optional)
      *
      * @throws \OpenAPIAccess\Client\ApiException on non-2xx response
      * @throws \InvalidArgumentException
-     * @return array of null, HTTP status code, HTTP response headers (array of strings)
+     * @return array of \OpenAPIAccess\Client\Model\PendingTransaction|\OpenAPIAccess\Client\Model\ErrorMessage|\OpenAPIAccess\Client\Model\BadCredentialsError|\OpenAPIAccess\Client\Model\ErrorMessage|\OpenAPIAccess\Client\Model\ErrorMessage|\OpenAPIAccess\Client\Model\ErrorMessage, HTTP status code, HTTP response headers (array of strings)
      */
-    public function revokeTokenWithHttpInfo($token, $x_request_id = null, $token_type_hint = null)
+    public function getPendingTransactionWithHttpInfo($id, $x_request_id = null)
     {
-        $request = $this->revokeTokenRequest($token, $x_request_id, $token_type_hint);
+        $request = $this->getPendingTransactionRequest($id, $x_request_id);
 
         try {
             $options = $this->createHttpClientOption();
@@ -651,10 +643,125 @@ class AuthorizationApi
                 );
             }
 
-            return [null, $statusCode, $response->getHeaders()];
+            switch($statusCode) {
+                case 200:
+                    if ('\OpenAPIAccess\Client\Model\PendingTransaction' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\OpenAPIAccess\Client\Model\PendingTransaction' !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\OpenAPIAccess\Client\Model\PendingTransaction', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 400:
+                    if ('\OpenAPIAccess\Client\Model\ErrorMessage' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\OpenAPIAccess\Client\Model\ErrorMessage' !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\OpenAPIAccess\Client\Model\ErrorMessage', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 401:
+                    if ('\OpenAPIAccess\Client\Model\BadCredentialsError' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\OpenAPIAccess\Client\Model\BadCredentialsError' !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\OpenAPIAccess\Client\Model\BadCredentialsError', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 403:
+                    if ('\OpenAPIAccess\Client\Model\ErrorMessage' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\OpenAPIAccess\Client\Model\ErrorMessage' !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\OpenAPIAccess\Client\Model\ErrorMessage', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 404:
+                    if ('\OpenAPIAccess\Client\Model\ErrorMessage' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\OpenAPIAccess\Client\Model\ErrorMessage' !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\OpenAPIAccess\Client\Model\ErrorMessage', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                case 500:
+                    if ('\OpenAPIAccess\Client\Model\ErrorMessage' === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ('\OpenAPIAccess\Client\Model\ErrorMessage' !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, '\OpenAPIAccess\Client\Model\ErrorMessage', []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+            }
+
+            $returnType = '\OpenAPIAccess\Client\Model\PendingTransaction';
+            if ($returnType === '\SplFileObject') {
+                $content = $response->getBody(); //stream goes to serializer
+            } else {
+                $content = (string) $response->getBody();
+                if ($returnType !== 'string') {
+                    $content = json_decode($content);
+                }
+            }
+
+            return [
+                ObjectSerializer::deserialize($content, $returnType, []),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            ];
 
         } catch (ApiException $e) {
             switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\OpenAPIAccess\Client\Model\PendingTransaction',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
                 case 400:
                     $data = ObjectSerializer::deserialize(
                         $e->getResponseBody(),
@@ -663,7 +770,23 @@ class AuthorizationApi
                     );
                     $e->setResponseObject($data);
                     break;
+                case 401:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\OpenAPIAccess\Client\Model\BadCredentialsError',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
                 case 403:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\OpenAPIAccess\Client\Model\ErrorMessage',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    break;
+                case 404:
                     $data = ObjectSerializer::deserialize(
                         $e->getResponseBody(),
                         '\OpenAPIAccess\Client\Model\ErrorMessage',
@@ -685,20 +808,19 @@ class AuthorizationApi
     }
 
     /**
-     * Operation revokeTokenAsync
+     * Operation getPendingTransactionAsync
      *
-     * Revoke a token
+     * Get a pending transaction
      *
-     * @param  string $token The token that the client wants to get revoked (required)
+     * @param  int $id Identifier of pending transaction (required)
      * @param  string $x_request_id With any API call, you can pass a request ID. The request ID can be an arbitrary string with up to 255 characters. Passing a longer string will result in an error. If you don&#39;t pass a request ID for a call, finAPI will generate a random ID internally. The request ID is always returned back in the response of a service, as a header with name &#39;X-Request-Id&#39;. We highly recommend to always pass a (preferably unique) request ID, and include it into your client application logs whenever you make a request or receive a response (especially in the case of an error response). finAPI is also logging request IDs on its end. Having a request ID can help the finAPI support team to work more efficiently and solve tickets faster. (optional)
-     * @param  string $token_type_hint A hint about the type of the token submitted for revocation (optional)
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function revokeTokenAsync($token, $x_request_id = null, $token_type_hint = null)
+    public function getPendingTransactionAsync($id, $x_request_id = null)
     {
-        return $this->revokeTokenAsyncWithHttpInfo($token, $x_request_id, $token_type_hint)
+        return $this->getPendingTransactionAsyncWithHttpInfo($id, $x_request_id)
             ->then(
                 function ($response) {
                     return $response[0];
@@ -707,27 +829,39 @@ class AuthorizationApi
     }
 
     /**
-     * Operation revokeTokenAsyncWithHttpInfo
+     * Operation getPendingTransactionAsyncWithHttpInfo
      *
-     * Revoke a token
+     * Get a pending transaction
      *
-     * @param  string $token The token that the client wants to get revoked (required)
+     * @param  int $id Identifier of pending transaction (required)
      * @param  string $x_request_id With any API call, you can pass a request ID. The request ID can be an arbitrary string with up to 255 characters. Passing a longer string will result in an error. If you don&#39;t pass a request ID for a call, finAPI will generate a random ID internally. The request ID is always returned back in the response of a service, as a header with name &#39;X-Request-Id&#39;. We highly recommend to always pass a (preferably unique) request ID, and include it into your client application logs whenever you make a request or receive a response (especially in the case of an error response). finAPI is also logging request IDs on its end. Having a request ID can help the finAPI support team to work more efficiently and solve tickets faster. (optional)
-     * @param  string $token_type_hint A hint about the type of the token submitted for revocation (optional)
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function revokeTokenAsyncWithHttpInfo($token, $x_request_id = null, $token_type_hint = null)
+    public function getPendingTransactionAsyncWithHttpInfo($id, $x_request_id = null)
     {
-        $returnType = '';
-        $request = $this->revokeTokenRequest($token, $x_request_id, $token_type_hint);
+        $returnType = '\OpenAPIAccess\Client\Model\PendingTransaction';
+        $request = $this->getPendingTransactionRequest($id, $x_request_id);
 
         return $this->client
             ->sendAsync($request, $this->createHttpClientOption())
             ->then(
                 function ($response) use ($returnType) {
-                    return [null, $response->getStatusCode(), $response->getHeaders()];
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
                 },
                 function ($exception) {
                     $response = $exception->getResponse();
@@ -747,28 +881,26 @@ class AuthorizationApi
     }
 
     /**
-     * Create request for operation 'revokeToken'
+     * Create request for operation 'getPendingTransaction'
      *
-     * @param  string $token The token that the client wants to get revoked (required)
+     * @param  int $id Identifier of pending transaction (required)
      * @param  string $x_request_id With any API call, you can pass a request ID. The request ID can be an arbitrary string with up to 255 characters. Passing a longer string will result in an error. If you don&#39;t pass a request ID for a call, finAPI will generate a random ID internally. The request ID is always returned back in the response of a service, as a header with name &#39;X-Request-Id&#39;. We highly recommend to always pass a (preferably unique) request ID, and include it into your client application logs whenever you make a request or receive a response (especially in the case of an error response). finAPI is also logging request IDs on its end. Having a request ID can help the finAPI support team to work more efficiently and solve tickets faster. (optional)
-     * @param  string $token_type_hint A hint about the type of the token submitted for revocation (optional)
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Psr7\Request
      */
-    public function revokeTokenRequest($token, $x_request_id = null, $token_type_hint = null)
+    public function getPendingTransactionRequest($id, $x_request_id = null)
     {
 
-        // verify the required parameter 'token' is set
-        if ($token === null || (is_array($token) && count($token) === 0)) {
+        // verify the required parameter 'id' is set
+        if ($id === null || (is_array($id) && count($id) === 0)) {
             throw new \InvalidArgumentException(
-                'Missing the required parameter $token when calling revokeToken'
+                'Missing the required parameter $id when calling getPendingTransaction'
             );
         }
 
 
-
-        $resourcePath = '/api/v2/oauth/revoke';
+        $resourcePath = '/api/v2/pendingTransactions/{id}';
         $formParams = [];
         $queryParams = [];
         $headerParams = [];
@@ -781,15 +913,15 @@ class AuthorizationApi
             $headerParams['X-Request-Id'] = ObjectSerializer::toHeaderValue($x_request_id);
         }
 
+        // path params
+        if ($id !== null) {
+            $resourcePath = str_replace(
+                '{' . 'id' . '}',
+                ObjectSerializer::toPathValue($id),
+                $resourcePath
+            );
+        }
 
-        // form params
-        if ($token !== null) {
-            $formParams['token'] = ObjectSerializer::toFormValue($token);
-        }
-        // form params
-        if ($token_type_hint !== null) {
-            $formParams['token_type_hint'] = ObjectSerializer::toFormValue($token_type_hint);
-        }
 
         if ($multipart) {
             $headers = $this->headerSelector->selectHeadersForMultipart(
@@ -798,7 +930,7 @@ class AuthorizationApi
         } else {
             $headers = $this->headerSelector->selectHeaders(
                 ['application/json'],
-                ['application/x-www-form-urlencoded']
+                []
             );
         }
 
@@ -850,7 +982,7 @@ class AuthorizationApi
         $operationHost = $this->config->getHost();
         $query = ObjectSerializer::buildQuery($queryParams);
         return new Request(
-            'POST',
+            'GET',
             $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
             $headers,
             $httpBody

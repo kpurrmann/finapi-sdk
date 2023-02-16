@@ -1,6 +1,6 @@
 <?php
 /**
- * RemoveInterfaceParams
+ * PendingTransactionPaypalData
  *
  * PHP version 7.4
  *
@@ -33,16 +33,16 @@ use \ArrayAccess;
 use \OpenAPIAccess\Client\ObjectSerializer;
 
 /**
- * RemoveInterfaceParams Class Doc Comment
+ * PendingTransactionPaypalData Class Doc Comment
  *
  * @category Class
- * @description Container for interface removal parameters
+ * @description &lt;strong&gt;Type:&lt;/strong&gt; PaypalTransactionData&lt;br/&gt; Additional, PayPal-specific transaction data.
  * @package  OpenAPIAccess\Client
  * @author   OpenAPI Generator team
  * @link     https://openapi-generator.tech
  * @implements \ArrayAccess<string, mixed>
  */
-class RemoveInterfaceParams implements ModelInterface, ArrayAccess, \JsonSerializable
+class PendingTransactionPaypalData implements ModelInterface, ArrayAccess, \JsonSerializable
 {
     public const DISCRIMINATOR = null;
 
@@ -51,7 +51,7 @@ class RemoveInterfaceParams implements ModelInterface, ArrayAccess, \JsonSeriali
       *
       * @var string
       */
-    protected static $openAPIModelName = 'RemoveInterfaceParams';
+    protected static $openAPIModelName = 'PendingTransaction_paypalData';
 
     /**
       * Array of property to type mappings. Used for (de)serialization
@@ -59,8 +59,9 @@ class RemoveInterfaceParams implements ModelInterface, ArrayAccess, \JsonSeriali
       * @var string[]
       */
     protected static $openAPITypes = [
-        'bank_connection_id' => 'int',
-        'banking_interface' => '\OpenAPIAccess\Client\Model\BankingInterface'
+        'invoice_number' => 'string',
+        'fee' => 'float',
+        'net' => 'float'
     ];
 
     /**
@@ -71,8 +72,9 @@ class RemoveInterfaceParams implements ModelInterface, ArrayAccess, \JsonSeriali
       * @psalm-var array<string, string|null>
       */
     protected static $openAPIFormats = [
-        'bank_connection_id' => 'int64',
-        'banking_interface' => null
+        'invoice_number' => null,
+        'fee' => null,
+        'net' => null
     ];
 
     /**
@@ -81,8 +83,9 @@ class RemoveInterfaceParams implements ModelInterface, ArrayAccess, \JsonSeriali
       * @var boolean[]
       */
     protected static array $openAPINullables = [
-        'bank_connection_id' => false,
-		'banking_interface' => false
+        'invoice_number' => false,
+		'fee' => false,
+		'net' => false
     ];
 
     /**
@@ -161,8 +164,9 @@ class RemoveInterfaceParams implements ModelInterface, ArrayAccess, \JsonSeriali
      * @var string[]
      */
     protected static $attributeMap = [
-        'bank_connection_id' => 'bankConnectionId',
-        'banking_interface' => 'bankingInterface'
+        'invoice_number' => 'invoiceNumber',
+        'fee' => 'fee',
+        'net' => 'net'
     ];
 
     /**
@@ -171,8 +175,9 @@ class RemoveInterfaceParams implements ModelInterface, ArrayAccess, \JsonSeriali
      * @var string[]
      */
     protected static $setters = [
-        'bank_connection_id' => 'setBankConnectionId',
-        'banking_interface' => 'setBankingInterface'
+        'invoice_number' => 'setInvoiceNumber',
+        'fee' => 'setFee',
+        'net' => 'setNet'
     ];
 
     /**
@@ -181,8 +186,9 @@ class RemoveInterfaceParams implements ModelInterface, ArrayAccess, \JsonSeriali
      * @var string[]
      */
     protected static $getters = [
-        'bank_connection_id' => 'getBankConnectionId',
-        'banking_interface' => 'getBankingInterface'
+        'invoice_number' => 'getInvoiceNumber',
+        'fee' => 'getFee',
+        'net' => 'getNet'
     ];
 
     /**
@@ -242,8 +248,9 @@ class RemoveInterfaceParams implements ModelInterface, ArrayAccess, \JsonSeriali
      */
     public function __construct(array $data = null)
     {
-        $this->setIfExists('bank_connection_id', $data ?? [], null);
-        $this->setIfExists('banking_interface', $data ?? [], null);
+        $this->setIfExists('invoice_number', $data ?? [], null);
+        $this->setIfExists('fee', $data ?? [], null);
+        $this->setIfExists('net', $data ?? [], null);
     }
 
     /**
@@ -273,12 +280,6 @@ class RemoveInterfaceParams implements ModelInterface, ArrayAccess, \JsonSeriali
     {
         $invalidProperties = [];
 
-        if ($this->container['bank_connection_id'] === null) {
-            $invalidProperties[] = "'bank_connection_id' can't be null";
-        }
-        if ($this->container['banking_interface'] === null) {
-            $invalidProperties[] = "'banking_interface' can't be null";
-        }
         return $invalidProperties;
     }
 
@@ -295,59 +296,88 @@ class RemoveInterfaceParams implements ModelInterface, ArrayAccess, \JsonSeriali
 
 
     /**
-     * Gets bank_connection_id
+     * Gets invoice_number
      *
-     * @return int
+     * @return string|null
      */
-    public function getBankConnectionId()
+    public function getInvoiceNumber()
     {
-        return $this->container['bank_connection_id'];
+        return $this->container['invoice_number'];
     }
 
     /**
-     * Sets bank_connection_id
+     * Sets invoice_number
      *
-     * @param int $bank_connection_id Bank connection identifier
+     * @param string|null $invoice_number Invoice Number.
      *
      * @return self
      */
-    public function setBankConnectionId($bank_connection_id)
+    public function setInvoiceNumber($invoice_number)
     {
 
-        if (is_null($bank_connection_id)) {
-            throw new \InvalidArgumentException('non-nullable bank_connection_id cannot be null');
+        if (is_null($invoice_number)) {
+            throw new \InvalidArgumentException('non-nullable invoice_number cannot be null');
         }
 
-        $this->container['bank_connection_id'] = $bank_connection_id;
+        $this->container['invoice_number'] = $invoice_number;
 
         return $this;
     }
 
     /**
-     * Gets banking_interface
+     * Gets fee
      *
-     * @return BankingInterface
+     * @return float|null
      */
-    public function getBankingInterface()
+    public function getFee()
     {
-        return $this->container['banking_interface'];
+        return $this->container['fee'];
     }
 
     /**
-     * Sets banking_interface
+     * Sets fee
      *
-     * @param BankingInterface $banking_interface <strong>Type:</strong> BankingInterface<br/> The interface which you want to remove.
+     * @param float|null $fee Fee value.
      *
      * @return self
      */
-    public function setBankingInterface($banking_interface)
+    public function setFee($fee)
     {
 
-        if (is_null($banking_interface)) {
-            throw new \InvalidArgumentException('non-nullable banking_interface cannot be null');
+        if (is_null($fee)) {
+            throw new \InvalidArgumentException('non-nullable fee cannot be null');
         }
 
-        $this->container['banking_interface'] = $banking_interface;
+        $this->container['fee'] = $fee;
+
+        return $this;
+    }
+
+    /**
+     * Gets net
+     *
+     * @return float|null
+     */
+    public function getNet()
+    {
+        return $this->container['net'];
+    }
+
+    /**
+     * Sets net
+     *
+     * @param float|null $net Net value.
+     *
+     * @return self
+     */
+    public function setNet($net)
+    {
+
+        if (is_null($net)) {
+            throw new \InvalidArgumentException('non-nullable net cannot be null');
+        }
+
+        $this->container['net'] = $net;
 
         return $this;
     }

@@ -11,9 +11,9 @@
  */
 
 /**
- * finAPI Access V1 (deprecated)
+ * finAPI Access V2
  *
- * <strong>RESTful API for Account Information Services (AIS) and Payment Initiation Services (PIS)</strong> <br/> <strong>Application Version:</strong> 2.7.0 <br/>  The following pages give you some general information on how to use our APIs.<br/> The actual API services documentation then follows further below. You can use the menu to jump between API sections. <br/> <br/> This page has a built-in HTTP(S) client, so you can test the services directly from within this page, by filling in the request parameters and/or body in the respective services, and then hitting the TRY button. Note that you need to be authorized to make a successful API call. To authorize, refer to the 'Authorization' section of the API, or just use the OAUTH button that can be found near the TRY button. <br/>  <h2 id=\"general-information\">General information</h2>  <h3 id=\"general-error-responses\"><strong>Error Responses</strong></h3> When an API call returns with an error, then in general it has the structure shown in the following example:  <pre> {   \"errors\": [     {       \"message\": \"Interface 'FINTS_SERVER' is not supported for this operation.\",       \"code\": \"BAD_REQUEST\",       \"type\": \"TECHNICAL\"     }   ],   \"date\": \"2020-11-19 16:54:06.854\",   \"requestId\": \"selfgen-312042e7-df55-47e4-bffd-956a68ef37b5\",   \"endpoint\": \"POST /api/v1/bankConnections/import\",   \"authContext\": \"1/21\",   \"bank\": \"DEMO0002 - finAPI Test Redirect Bank\" } </pre>  If an API call requires an additional authentication by the user, HTTP code 510 is returned and the error response contains the additional \"multiStepAuthentication\" object, see the following example:  <pre> {   \"errors\": [     {       \"message\": \"Es ist eine zusätzliche Authentifizierung erforderlich. Bitte geben Sie folgenden Code an: 123456\",       \"code\": \"ADDITIONAL_AUTHENTICATION_REQUIRED\",       \"type\": \"BUSINESS\",       \"multiStepAuthentication\": {         \"hash\": \"678b13f4be9ed7d981a840af8131223a\",         \"status\": \"CHALLENGE_RESPONSE_REQUIRED\",         \"challengeMessage\": \"Es ist eine zusätzliche Authentifizierung erforderlich. Bitte geben Sie folgenden Code an: 123456\",         \"answerFieldLabel\": \"TAN\",         \"redirectUrl\": null,         \"redirectContext\": null,         \"redirectContextField\": null,         \"twoStepProcedures\": null,         \"photoTanMimeType\": null,         \"photoTanData\": null,         \"opticalData\": null,         \"opticalDataAsReinerSct\": false       }     }   ],   \"date\": \"2019-11-29 09:51:55.931\",   \"requestId\": \"selfgen-45059c99-1b14-4df7-9bd3-9d5f126df294\",   \"endpoint\": \"POST /api/v1/bankConnections/import\",   \"authContext\": \"1/18\",   \"bank\": \"DEMO0001 - finAPI Test Bank\" } </pre>  An exception to this error format are API authentication errors, where the following structure is returned:  <pre> {   \"error\": \"invalid_token\",   \"error_description\": \"Invalid access token: cccbce46-xxxx-xxxx-xxxx-xxxxxxxxxx\" } </pre>  <h3 id=\"general-paging\"><strong>Paging</strong></h3> API services that may potentially return a lot of data implement paging. They return a limited number of entries within a \"page\". Further entries must be fetched with subsequent calls. <br/><br/> Any API service that implements paging provides the following input parameters:<br/> &bull; \"page\": the number of the page to be retrieved (starting with 1).<br/> &bull; \"perPage\": the number of entries within a page. The default and maximum value is stated in the documentation of the respective services.  A paged response contains an additional \"paging\" object with the following structure:  <pre> {   ...   ,   \"paging\": {     \"page\": 1,     \"perPage\": 20,     \"pageCount\": 234,     \"totalCount\": 4662   } } </pre>  <h3 id=\"general-internationalization\"><strong>Internationalization</strong></h3> The finAPI services support internationalization which means you can define the language you prefer for API service responses. <br/><br/> The following languages are available: German, English, Czech, Slovak. <br/><br/> The preferred language can be defined by providing the official HTTP <strong>Accept-Language</strong> header. <br/><br/> finAPI reacts on the official iso language codes &quot;de&quot;, &quot;en&quot;, &quot;cs&quot; and &quot;sk&quot; for the named languages. Additional subtags supported by the Accept-Language header may be provided, e.g. &quot;en-US&quot;, but are ignored. <br/> If no Accept-Language header is given, German is used as the default language. <br/><br/> Exceptions:<br/> &bull; Bank login hints and login fields are only available in the language of the bank and not being translated.<br/> &bull; Direct messages from the bank systems typically returned as BUSINESS errors will not be translated.<br/> &bull; BUSINESS errors created by finAPI directly are available in German and English.<br/> &bull; TECHNICAL errors messages meant for developers are mostly in English, but also may be translated.  <h3 id=\"general-request-ids\"><strong>Request IDs</strong></h3> With any API call, you can pass a request ID via a header with name \"X-Request-Id\". The request ID can be an arbitrary string with up to 255 characters. Passing a longer string will result in an error. <br/><br/> If you don't pass a request ID for a call, finAPI will generate a random ID internally. <br/><br/> The request ID is always returned back in the response of a service, as a header with name \"X-Request-Id\". <br/><br/> We highly recommend to always pass a (preferably unique) request ID, and include it into your client application logs whenever you make a request or receive a response (especially in the case of an error response). finAPI is also logging request IDs on its end. Having a request ID can help the finAPI support team to work more efficiently and solve tickets faster.  <h3 id=\"general-overriding-http-methods\"><strong>Overriding HTTP methods</strong></h3> Some HTTP clients do not support the HTTP methods PATCH or DELETE. If you are using such a client in your application, you can use a POST request instead with a special HTTP header indicating the originally intended HTTP method. <br/><br/> The header's name is <strong>X-HTTP-Method-Override</strong>. Set its value to either <strong>PATCH</strong> or <strong>DELETE</strong>. POST Requests having this header set will be treated either as PATCH or DELETE by the finAPI servers. <br/><br/> Example: <br/><br/> <strong>X-HTTP-Method-Override: PATCH</strong><br/> POST /api/v1/label/51<br/> {\"name\": \"changed label\"}<br/><br/> will be interpreted by finAPI as:<br/><br/> PATCH /api/v1/label/51<br/> {\"name\": \"changed label\"}<br/>  <h3 id=\"general-user-metadata\"><strong>User metadata</strong></h3> With the migration to PSD2 APIs, a new term called \"User metadata\" (also known as \"PSU metadata\") has been introduced to the API. This user metadata aims to inform the banking API if there was a real end-user behind an HTTP request or if the request was triggered by a system (e.g. by an automatic batch update). In the latter case, the bank may apply some restrictions such as limiting the number of HTTP requests for a single consent. Also, some operations may be forbidden entirely by the banking API. For example, some banks do not allow issuing a new consent without the end-user being involved. Therefore, it is certainly necessary and obligatory for the customer to provide the PSU metadata for such operations. <br/><br/> As finAPI does not have direct interaction with the end-user, it is the client application's responsibility to provide all the necessary information about the end-user. This must be done by sending additional headers with every request triggered on behalf of the end-user. <br/><br/> At the moment, the following headers are supported by the API:<br/> &bull; \"PSU-IP-Address\" - the IP address of the user's device.<br/> &bull; \"PSU-Device-OS\" - the user's device and/or operating system identification.<br/> &bull; \"PSU-User-Agent\" - the user's web browser or other client device identification.  <h3 id=\"general-faq\"><strong>FAQ</strong></h3> <strong>Is there a finAPI SDK?</strong> <br/> Currently we do not offer a native SDK, but there is the option to generate an SDK for almost any target language via OpenAPI. Use the 'Download SDK' button on this page for SDK generation. <br/> <br/> <strong>How can I enable finAPI's automatic batch update?</strong> <br/> Currently there is no way to set up the batch update via the API. Please contact support@finapi.io for this. <br/> <br/> <strong>Why do I need to keep authorizing when calling services on this page?</strong> <br/> This page is a \"one-page-app\". Reloading the page resets the OAuth authorization context. There is generally no need to reload the page, so just don't do it and your authorization will persist.
+ * <strong>RESTful API for Account Information Services (AIS) and Payment Initiation Services (PIS)</strong> <br/> <strong>Application Version:</strong> 2.7.0 <br/>  The following pages give you some general information on how to use our APIs.<br/> The actual API services documentation then follows further below. You can use the menu to jump between API sections. <br/> <br/> This page has a built-in HTTP(S) client, so you can test the services directly from within this page, by filling in the request parameters and/or body in the respective services, and then hitting the TRY button. Note that you need to be authorized to make a successful API call. To authorize, refer to the 'Authorization' section of the API, or just use the OAUTH button that can be found near the TRY button. <br/>  <h2 id=\"general-information\">General information</h2>  <h3 id=\"general-error-responses\"><strong>Error Responses</strong></h3> When an API call returns with an error, then in general it has the structure shown in the following example:  <pre> {   \"errors\": [     {       \"message\": \"Interface 'FINTS_SERVER' is not supported for this operation.\",       \"code\": \"BAD_REQUEST\",       \"type\": \"TECHNICAL\"     }   ],   \"date\": \"2020-11-19T16:54:06.854+01:00\",   \"requestId\": \"selfgen-312042e7-df55-47e4-bffd-956a68ef37b5\",   \"endpoint\": \"POST /api/v2/bankConnections/import\",   \"authContext\": \"1/21\",   \"bank\": \"DEMO0002 - finAPI Test Redirect Bank\" } </pre>  If an API call requires an additional authentication by the user, HTTP code 510 is returned and the error response contains the additional \"multiStepAuthentication\" object, see the following example:  <pre> {   \"errors\": [     {       \"message\": \"Es ist eine zusätzliche Authentifizierung erforderlich. Bitte geben Sie folgenden Code an: 123456\",       \"code\": \"ADDITIONAL_AUTHENTICATION_REQUIRED\",       \"type\": \"BUSINESS\",       \"multiStepAuthentication\": {         \"hash\": \"678b13f4be9ed7d981a840af8131223a\",         \"status\": \"CHALLENGE_RESPONSE_REQUIRED\",         \"challengeMessage\": \"Es ist eine zusätzliche Authentifizierung erforderlich. Bitte geben Sie folgenden Code an: 123456\",         \"answerFieldLabel\": \"TAN\",         \"redirectUrl\": null,         \"redirectContext\": null,         \"redirectContextField\": null,         \"twoStepProcedures\": null,         \"photoTanMimeType\": null,         \"photoTanData\": null,         \"opticalData\": null,         \"opticalDataAsReinerSct\": false       }     }   ],   \"date\": \"2019-11-29T09:51:55.931+01:00\",   \"requestId\": \"selfgen-45059c99-1b14-4df7-9bd3-9d5f126df294\",   \"endpoint\": \"POST /api/v2/bankConnections/import\",   \"authContext\": \"1/18\",   \"bank\": \"DEMO0001 - finAPI Test Bank\" } </pre>  An exception to this error format are API authentication errors, where the following structure is returned:  <pre> {   \"error\": \"invalid_token\",   \"error_description\": \"Invalid access token: cccbce46-xxxx-xxxx-xxxx-xxxxxxxxxx\" } </pre>  <h3 id=\"general-paging\"><strong>Paging</strong></h3> API services that may potentially return a lot of data implement paging. They return a limited number of entries within a \"page\". Further entries must be fetched with subsequent calls. <br/><br/> Any API service that implements paging provides the following input parameters:<br/> &bull; \"page\": the number of the page to be retrieved (starting with 1).<br/> &bull; \"perPage\": the number of entries within a page. The default and maximum value is stated in the documentation of the respective services.  A paged response contains an additional \"paging\" object with the following structure:  <pre> {   ...   ,   \"paging\": {     \"page\": 1,     \"perPage\": 20,     \"pageCount\": 234,     \"totalCount\": 4662   } } </pre>  <h3 id=\"general-internationalization\"><strong>Internationalization</strong></h3> The finAPI services support internationalization which means you can define the language you prefer for API service responses. <br/><br/> The following languages are available: German, English, Czech, Slovak. <br/><br/> The preferred language can be defined by providing the official HTTP <strong>Accept-Language</strong> header. <br/><br/> finAPI reacts on the official iso language codes &quot;de&quot;, &quot;en&quot;, &quot;cs&quot; and &quot;sk&quot; for the named languages. Additional subtags supported by the Accept-Language header may be provided, e.g. &quot;en-US&quot;, but are ignored. <br/> If no Accept-Language header is given, German is used as the default language. <br/><br/> Exceptions:<br/> &bull; Bank login hints and login fields are only available in the language of the bank and not being translated.<br/> &bull; Direct messages from the bank systems typically returned as BUSINESS errors will not be translated.<br/> &bull; BUSINESS errors created by finAPI directly are available in German and English.<br/> &bull; TECHNICAL errors messages meant for developers are mostly in English, but also may be translated.  <h3 id=\"general-request-ids\"><strong>Request IDs</strong></h3> With any API call, you can pass a request ID via a header with name \"X-Request-Id\". The request ID can be an arbitrary string with up to 255 characters. Passing a longer string will result in an error. <br/><br/> If you don't pass a request ID for a call, finAPI will generate a random ID internally. <br/><br/> The request ID is always returned back in the response of a service, as a header with name \"X-Request-Id\". <br/><br/> We highly recommend to always pass a (preferably unique) request ID, and include it into your client application logs whenever you make a request or receive a response (especially in the case of an error response). finAPI is also logging request IDs on its end. Having a request ID can help the finAPI support team to work more efficiently and solve tickets faster.  <h3 id=\"general-overriding-http-methods\"><strong>Overriding HTTP methods</strong></h3> Some HTTP clients do not support the HTTP methods PATCH or DELETE. If you are using such a client in your application, you can use a POST request instead with a special HTTP header indicating the originally intended HTTP method. <br/><br/> The header's name is <strong>X-HTTP-Method-Override</strong>. Set its value to either <strong>PATCH</strong> or <strong>DELETE</strong>. POST Requests having this header set will be treated either as PATCH or DELETE by the finAPI servers. <br/><br/> Example: <br/><br/> <strong>X-HTTP-Method-Override: PATCH</strong><br/> POST /api/v2/label/51<br/> {\"name\": \"changed label\"}<br/><br/> will be interpreted by finAPI as:<br/><br/> PATCH /api/v2/label/51<br/> {\"name\": \"changed label\"}<br/>  <h3 id=\"general-user-metadata\"><strong>User metadata</strong></h3> With the migration to PSD2 APIs, a new term called \"User metadata\" (also known as \"PSU metadata\") has been introduced to the API. This user metadata aims to inform the banking API if there was a real end-user behind an HTTP request or if the request was triggered by a system (e.g. by an automatic batch update). In the latter case, the bank may apply some restrictions such as limiting the number of HTTP requests for a single consent. Also, some operations may be forbidden entirely by the banking API. For example, some banks do not allow issuing a new consent without the end-user being involved. Therefore, it is certainly necessary and obligatory for the customer to provide the PSU metadata for such operations. <br/><br/> As finAPI does not have direct interaction with the end-user, it is the client application's responsibility to provide all the necessary information about the end-user. This must be done by sending additional headers with every request triggered on behalf of the end-user. <br/><br/> At the moment, the following headers are supported by the API:<br/> &bull; \"PSU-IP-Address\" - the IP address of the user's device.<br/> &bull; \"PSU-Device-OS\" - the user's device and/or operating system identification.<br/> &bull; \"PSU-User-Agent\" - the user's web browser or other client device identification.  <h3 id=\"general-faq\"><strong>FAQ</strong></h3> <strong>Is there a finAPI SDK?</strong> <br/> Currently we do not offer a native SDK, but there is the option to generate an SDK for almost any target language via OpenAPI. Use the 'Download SDK' button on this page for SDK generation. <br/> <br/> <strong>How can I enable finAPI's automatic batch update?</strong> <br/> Currently there is no way to set up the batch update via the API. Please contact support@finapi.io for this. <br/> <br/> <strong>Why do I need to keep authorizing when calling services on this page?</strong> <br/> This page is a \"one-page-app\". Reloading the page resets the OAuth authorization context. There is generally no need to reload the page, so just don't do it and your authorization will persist.
  *
  * The version of the OpenAPI document: 2023.06.1
  * Contact: kontakt@finapi.io
@@ -59,16 +59,16 @@ class BankInterface implements ModelInterface, ArrayAccess, \JsonSerializable
       * @var string[]
       */
     protected static $openAPITypes = [
-        'interface' => '\OpenAPIAccess\Client\Model\BankingInterface',
+        'banking_interface' => '\OpenAPIAccess\Client\Model\BankingInterface',
         'tpp_authentication_group' => '\OpenAPIAccess\Client\Model\BankInterfaceTppAuthenticationGroup',
         'login_credentials' => '\OpenAPIAccess\Client\Model\BankInterfaceLoginField[]',
         'properties' => '\OpenAPIAccess\Client\Model\BankInterfaceProperty[]',
         'login_hint' => 'string',
         'health' => 'int',
-        'last_communication_attempt' => 'string',
-        'last_successful_communication' => 'string',
-        'is_money_transfer_supported' => 'bool',
+        'last_communication_attempt' => '\DateTime',
+        'last_successful_communication' => '\DateTime',
         'is_ais_supported' => 'bool',
+        'is_pis_supported' => 'bool',
         'payment_capabilities' => '\OpenAPIAccess\Client\Model\BankInterfacePaymentCapabilities',
         'ais_account_types' => '\OpenAPIAccess\Client\Model\AccountType[]'
     ];
@@ -81,16 +81,16 @@ class BankInterface implements ModelInterface, ArrayAccess, \JsonSerializable
       * @psalm-var array<string, string|null>
       */
     protected static $openAPIFormats = [
-        'interface' => null,
+        'banking_interface' => null,
         'tpp_authentication_group' => null,
         'login_credentials' => null,
         'properties' => null,
         'login_hint' => null,
         'health' => 'int32',
-        'last_communication_attempt' => null,
-        'last_successful_communication' => null,
-        'is_money_transfer_supported' => null,
+        'last_communication_attempt' => 'date-time',
+        'last_successful_communication' => 'date-time',
         'is_ais_supported' => null,
+        'is_pis_supported' => null,
         'payment_capabilities' => null,
         'ais_account_types' => null
     ];
@@ -101,16 +101,16 @@ class BankInterface implements ModelInterface, ArrayAccess, \JsonSerializable
       * @var boolean[]
       */
     protected static array $openAPINullables = [
-        'interface' => false,
-		'tpp_authentication_group' => true,
+        'banking_interface' => false,
+		'tpp_authentication_group' => false,
 		'login_credentials' => false,
 		'properties' => false,
-		'login_hint' => true,
+		'login_hint' => false,
 		'health' => false,
-		'last_communication_attempt' => true,
-		'last_successful_communication' => true,
-		'is_money_transfer_supported' => false,
+		'last_communication_attempt' => false,
+		'last_successful_communication' => false,
 		'is_ais_supported' => false,
+		'is_pis_supported' => false,
 		'payment_capabilities' => false,
 		'ais_account_types' => false
     ];
@@ -191,7 +191,7 @@ class BankInterface implements ModelInterface, ArrayAccess, \JsonSerializable
      * @var string[]
      */
     protected static $attributeMap = [
-        'interface' => 'interface',
+        'banking_interface' => 'bankingInterface',
         'tpp_authentication_group' => 'tppAuthenticationGroup',
         'login_credentials' => 'loginCredentials',
         'properties' => 'properties',
@@ -199,8 +199,8 @@ class BankInterface implements ModelInterface, ArrayAccess, \JsonSerializable
         'health' => 'health',
         'last_communication_attempt' => 'lastCommunicationAttempt',
         'last_successful_communication' => 'lastSuccessfulCommunication',
-        'is_money_transfer_supported' => 'isMoneyTransferSupported',
         'is_ais_supported' => 'isAisSupported',
+        'is_pis_supported' => 'isPisSupported',
         'payment_capabilities' => 'paymentCapabilities',
         'ais_account_types' => 'aisAccountTypes'
     ];
@@ -211,7 +211,7 @@ class BankInterface implements ModelInterface, ArrayAccess, \JsonSerializable
      * @var string[]
      */
     protected static $setters = [
-        'interface' => 'setInterface',
+        'banking_interface' => 'setBankingInterface',
         'tpp_authentication_group' => 'setTppAuthenticationGroup',
         'login_credentials' => 'setLoginCredentials',
         'properties' => 'setProperties',
@@ -219,8 +219,8 @@ class BankInterface implements ModelInterface, ArrayAccess, \JsonSerializable
         'health' => 'setHealth',
         'last_communication_attempt' => 'setLastCommunicationAttempt',
         'last_successful_communication' => 'setLastSuccessfulCommunication',
-        'is_money_transfer_supported' => 'setIsMoneyTransferSupported',
         'is_ais_supported' => 'setIsAisSupported',
+        'is_pis_supported' => 'setIsPisSupported',
         'payment_capabilities' => 'setPaymentCapabilities',
         'ais_account_types' => 'setAisAccountTypes'
     ];
@@ -231,7 +231,7 @@ class BankInterface implements ModelInterface, ArrayAccess, \JsonSerializable
      * @var string[]
      */
     protected static $getters = [
-        'interface' => 'getInterface',
+        'banking_interface' => 'getBankingInterface',
         'tpp_authentication_group' => 'getTppAuthenticationGroup',
         'login_credentials' => 'getLoginCredentials',
         'properties' => 'getProperties',
@@ -239,8 +239,8 @@ class BankInterface implements ModelInterface, ArrayAccess, \JsonSerializable
         'health' => 'getHealth',
         'last_communication_attempt' => 'getLastCommunicationAttempt',
         'last_successful_communication' => 'getLastSuccessfulCommunication',
-        'is_money_transfer_supported' => 'getIsMoneyTransferSupported',
         'is_ais_supported' => 'getIsAisSupported',
+        'is_pis_supported' => 'getIsPisSupported',
         'payment_capabilities' => 'getPaymentCapabilities',
         'ais_account_types' => 'getAisAccountTypes'
     ];
@@ -302,7 +302,7 @@ class BankInterface implements ModelInterface, ArrayAccess, \JsonSerializable
      */
     public function __construct(array $data = null)
     {
-        $this->setIfExists('interface', $data ?? [], null);
+        $this->setIfExists('banking_interface', $data ?? [], null);
         $this->setIfExists('tpp_authentication_group', $data ?? [], null);
         $this->setIfExists('login_credentials', $data ?? [], null);
         $this->setIfExists('properties', $data ?? [], null);
@@ -310,8 +310,8 @@ class BankInterface implements ModelInterface, ArrayAccess, \JsonSerializable
         $this->setIfExists('health', $data ?? [], null);
         $this->setIfExists('last_communication_attempt', $data ?? [], null);
         $this->setIfExists('last_successful_communication', $data ?? [], null);
-        $this->setIfExists('is_money_transfer_supported', $data ?? [], null);
         $this->setIfExists('is_ais_supported', $data ?? [], null);
+        $this->setIfExists('is_pis_supported', $data ?? [], null);
         $this->setIfExists('payment_capabilities', $data ?? [], null);
         $this->setIfExists('ais_account_types', $data ?? [], null);
     }
@@ -343,20 +343,14 @@ class BankInterface implements ModelInterface, ArrayAccess, \JsonSerializable
     {
         $invalidProperties = [];
 
-        if ($this->container['interface'] === null) {
-            $invalidProperties[] = "'interface' can't be null";
-        }
-        if ($this->container['tpp_authentication_group'] === null) {
-            $invalidProperties[] = "'tpp_authentication_group' can't be null";
+        if ($this->container['banking_interface'] === null) {
+            $invalidProperties[] = "'banking_interface' can't be null";
         }
         if ($this->container['login_credentials'] === null) {
             $invalidProperties[] = "'login_credentials' can't be null";
         }
         if ($this->container['properties'] === null) {
             $invalidProperties[] = "'properties' can't be null";
-        }
-        if ($this->container['login_hint'] === null) {
-            $invalidProperties[] = "'login_hint' can't be null";
         }
         if ($this->container['health'] === null) {
             $invalidProperties[] = "'health' can't be null";
@@ -369,17 +363,11 @@ class BankInterface implements ModelInterface, ArrayAccess, \JsonSerializable
             $invalidProperties[] = "invalid value for 'health', must be bigger than or equal to 0.";
         }
 
-        if ($this->container['last_communication_attempt'] === null) {
-            $invalidProperties[] = "'last_communication_attempt' can't be null";
-        }
-        if ($this->container['last_successful_communication'] === null) {
-            $invalidProperties[] = "'last_successful_communication' can't be null";
-        }
-        if ($this->container['is_money_transfer_supported'] === null) {
-            $invalidProperties[] = "'is_money_transfer_supported' can't be null";
-        }
         if ($this->container['is_ais_supported'] === null) {
             $invalidProperties[] = "'is_ais_supported' can't be null";
+        }
+        if ($this->container['is_pis_supported'] === null) {
+            $invalidProperties[] = "'is_pis_supported' can't be null";
         }
         if ($this->container['payment_capabilities'] === null) {
             $invalidProperties[] = "'payment_capabilities' can't be null";
@@ -403,30 +391,30 @@ class BankInterface implements ModelInterface, ArrayAccess, \JsonSerializable
 
 
     /**
-     * Gets interface
+     * Gets banking_interface
      *
      * @return BankingInterface
      */
-    public function getInterface()
+    public function getBankingInterface()
     {
-        return $this->container['interface'];
+        return $this->container['banking_interface'];
     }
 
     /**
-     * Sets interface
+     * Sets banking_interface
      *
-     * @param BankingInterface $interface <strong>Type:</strong> BankingInterface<br/> Bank interface. Possible values:<br><br>&bull; <code>WEB_SCRAPER</code> - means that finAPI will parse data from the bank's online banking website.<br>&bull; <code>FINTS_SERVER</code> - means that finAPI will download data via the bank's FinTS server.<br>&bull; <code>XS2A</code> - means that finAPI will download data via the bank's XS2A interface.<br>
+     * @param BankingInterface $banking_interface <strong>Type:</strong> BankingInterface<br/> Banking interface. Possible values:<br><br>&bull; <code>WEB_SCRAPER</code> - means that finAPI will parse data from the bank's online banking website.<br>&bull; <code>FINTS_SERVER</code> - means that finAPI will download data via the bank's FinTS server.<br>&bull; <code>XS2A</code> - means that finAPI will download data via the bank's XS2A interface.<br>
      *
      * @return self
      */
-    public function setInterface($interface)
+    public function setBankingInterface($banking_interface)
     {
 
-        if (is_null($interface)) {
-            throw new \InvalidArgumentException('non-nullable interface cannot be null');
+        if (is_null($banking_interface)) {
+            throw new \InvalidArgumentException('non-nullable banking_interface cannot be null');
         }
 
-        $this->container['interface'] = $interface;
+        $this->container['banking_interface'] = $banking_interface;
 
         return $this;
     }
@@ -434,7 +422,7 @@ class BankInterface implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets tpp_authentication_group
      *
-     * @return \OpenAPIAccess\Client\Model\BankInterfaceTppAuthenticationGroup
+     * @return \OpenAPIAccess\Client\Model\BankInterfaceTppAuthenticationGroup|null
      */
     public function getTppAuthenticationGroup()
     {
@@ -444,7 +432,7 @@ class BankInterface implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets tpp_authentication_group
      *
-     * @param \OpenAPIAccess\Client\Model\BankInterfaceTppAuthenticationGroup $tpp_authentication_group tpp_authentication_group
+     * @param \OpenAPIAccess\Client\Model\BankInterfaceTppAuthenticationGroup|null $tpp_authentication_group tpp_authentication_group
      *
      * @return self
      */
@@ -452,14 +440,7 @@ class BankInterface implements ModelInterface, ArrayAccess, \JsonSerializable
     {
 
         if (is_null($tpp_authentication_group)) {
-            array_push($this->openAPINullablesSetToNull, 'tpp_authentication_group');
-        } else {
-            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
-            $index = array_search('tpp_authentication_group', $nullablesSetToNull);
-            if ($index !== FALSE) {
-                unset($nullablesSetToNull[$index]);
-                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
-            }
+            throw new \InvalidArgumentException('non-nullable tpp_authentication_group cannot be null');
         }
 
         $this->container['tpp_authentication_group'] = $tpp_authentication_group;
@@ -530,7 +511,7 @@ class BankInterface implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets login_hint
      *
-     * @return string
+     * @return string|null
      */
     public function getLoginHint()
     {
@@ -540,7 +521,7 @@ class BankInterface implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets login_hint
      *
-     * @param string $login_hint Login hint. Contains a German message for the user that explains what kind of credentials are expected.<br/><br/>Please note that it is essential to always show the login hint to the user if there is one, as the credentials that finAPI requires for the bank might be different to the credentials that the user knows from his online banking.<br/><br/>Also note that the contents of this field should always be interpreted as HTML, as the text might contain HTML tags for highlighted words, paragraphs, etc.
+     * @param string|null $login_hint Login hint. Contains a German message for the user that explains what kind of credentials are expected.<br/><br/>Please note that it is essential to always show the login hint to the user if there is one, as the credentials that finAPI requires for the bank might be different to the credentials that the user knows from his online banking.<br/><br/>Also note that the contents of this field should always be interpreted as HTML, as the text might contain HTML tags for highlighted words, paragraphs, etc.
      *
      * @return self
      */
@@ -548,14 +529,7 @@ class BankInterface implements ModelInterface, ArrayAccess, \JsonSerializable
     {
 
         if (is_null($login_hint)) {
-            array_push($this->openAPINullablesSetToNull, 'login_hint');
-        } else {
-            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
-            $index = array_search('login_hint', $nullablesSetToNull);
-            if ($index !== FALSE) {
-                unset($nullablesSetToNull[$index]);
-                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
-            }
+            throw new \InvalidArgumentException('non-nullable login_hint cannot be null');
         }
 
         $this->container['login_hint'] = $login_hint;
@@ -576,7 +550,7 @@ class BankInterface implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets health
      *
-     * @param int $health The health status of this interface. This is a value between 0 and 100, depicting the percentage of successful communication attempts with the bank via this interface during the latest couple of bank connection imports or updates (across the entire finAPI system). Note that 'successful' means that there was no technical error trying to establish a communication with the bank. Non-technical errors (like incorrect credentials) are regarded successful communication attempts.
+     * @param int $health The health status of this interface. This is a value between 0 and 100, depicting the percentage of successful communication attempts with the bank via this interface during the last couple of bank connection imports or updates (across the entire finAPI system). <br/><br/>Note:<br/>&bull; 'Successful' communication attempt means that there was no technical error trying to establish a communication with the bank. Non-technical errors (like incorrect credentials) are regarded successful communication attempts.<br/>&bull; If an interface is not supported (see fields 'isAisSupported'/'isPisSupported'), the health will always be 0.
      *
      * @return self
      */
@@ -603,7 +577,7 @@ class BankInterface implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets last_communication_attempt
      *
-     * @return string
+     * @return \DateTime|null
      */
     public function getLastCommunicationAttempt()
     {
@@ -613,7 +587,7 @@ class BankInterface implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets last_communication_attempt
      *
-     * @param string $last_communication_attempt <strong>Format:</strong> 'YYYY-MM-DD HH:MM:SS.SSS' (german time)<br/>Time of the last communication attempt with this interface during an import, update or connect interface (across the entire finAPI system).
+     * @param \DateTime|null $last_communication_attempt <strong>Format:</strong> 'YYYY-MM-DD'T'HH:MM:SS.SSSXXX' (RFC 3339, section 5.6)<br/>Time of the last communication attempt with this interface during an import, update or connect interface (across the entire finAPI system).
      *
      * @return self
      */
@@ -621,14 +595,7 @@ class BankInterface implements ModelInterface, ArrayAccess, \JsonSerializable
     {
 
         if (is_null($last_communication_attempt)) {
-            array_push($this->openAPINullablesSetToNull, 'last_communication_attempt');
-        } else {
-            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
-            $index = array_search('last_communication_attempt', $nullablesSetToNull);
-            if ($index !== FALSE) {
-                unset($nullablesSetToNull[$index]);
-                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
-            }
+            throw new \InvalidArgumentException('non-nullable last_communication_attempt cannot be null');
         }
 
         $this->container['last_communication_attempt'] = $last_communication_attempt;
@@ -639,7 +606,7 @@ class BankInterface implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets last_successful_communication
      *
-     * @return string
+     * @return \DateTime|null
      */
     public function getLastSuccessfulCommunication()
     {
@@ -649,7 +616,7 @@ class BankInterface implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets last_successful_communication
      *
-     * @param string $last_successful_communication <strong>Format:</strong> 'YYYY-MM-DD HH:MM:SS.SSS' (german time)<br/>Time of the last successful communication with this interface during an import, update or connect interface (across the entire finAPI system).
+     * @param \DateTime|null $last_successful_communication <strong>Format:</strong> 'YYYY-MM-DD'T'HH:MM:SS.SSSXXX' (RFC 3339, section 5.6)<br/>Time of the last successful communication with this interface during an import, update or connect interface (across the entire finAPI system).
      *
      * @return self
      */
@@ -657,46 +624,10 @@ class BankInterface implements ModelInterface, ArrayAccess, \JsonSerializable
     {
 
         if (is_null($last_successful_communication)) {
-            array_push($this->openAPINullablesSetToNull, 'last_successful_communication');
-        } else {
-            $nullablesSetToNull = $this->getOpenAPINullablesSetToNull();
-            $index = array_search('last_successful_communication', $nullablesSetToNull);
-            if ($index !== FALSE) {
-                unset($nullablesSetToNull[$index]);
-                $this->setOpenAPINullablesSetToNull($nullablesSetToNull);
-            }
+            throw new \InvalidArgumentException('non-nullable last_successful_communication cannot be null');
         }
 
         $this->container['last_successful_communication'] = $last_successful_communication;
-
-        return $this;
-    }
-
-    /**
-     * Gets is_money_transfer_supported
-     *
-     * @return bool
-     */
-    public function getIsMoneyTransferSupported()
-    {
-        return $this->container['is_money_transfer_supported'];
-    }
-
-    /**
-     * Sets is_money_transfer_supported
-     *
-     * @param bool $is_money_transfer_supported THIS FIELD IS DEPRECATED AND WILL BE REMOVED.<br/>Please refer to the 'paymentCapabilities' instead.<br/><br/>Whether this interface has the general capability to do money transfers.<br/><br/>Note: It still depends on the specifics of an account whether the account supports money transfer. In general, you should prefer the field AccountInterface.capabilities to determine what is possible for a specific account. This field here is meant to be used mainly for when you want to do standalone money transfers (finAPI Payment product), i.e. when you do not plan to import an account and thus will not have the information about the account's capabilities.
-     *
-     * @return self
-     */
-    public function setIsMoneyTransferSupported($is_money_transfer_supported)
-    {
-
-        if (is_null($is_money_transfer_supported)) {
-            throw new \InvalidArgumentException('non-nullable is_money_transfer_supported cannot be null');
-        }
-
-        $this->container['is_money_transfer_supported'] = $is_money_transfer_supported;
 
         return $this;
     }
@@ -726,6 +657,35 @@ class BankInterface implements ModelInterface, ArrayAccess, \JsonSerializable
         }
 
         $this->container['is_ais_supported'] = $is_ais_supported;
+
+        return $this;
+    }
+
+    /**
+     * Gets is_pis_supported
+     *
+     * @return bool
+     */
+    public function getIsPisSupported()
+    {
+        return $this->container['is_pis_supported'];
+    }
+
+    /**
+     * Sets is_pis_supported
+     *
+     * @param bool $is_pis_supported Whether this interface has the general capability to perform Payment Initiation Services (PIS). For more details, see the field 'paymentCapabilities'.
+     *
+     * @return self
+     */
+    public function setIsPisSupported($is_pis_supported)
+    {
+
+        if (is_null($is_pis_supported)) {
+            throw new \InvalidArgumentException('non-nullable is_pis_supported cannot be null');
+        }
+
+        $this->container['is_pis_supported'] = $is_pis_supported;
 
         return $this;
     }

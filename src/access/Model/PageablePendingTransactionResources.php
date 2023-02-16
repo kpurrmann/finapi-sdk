@@ -1,6 +1,6 @@
 <?php
 /**
- * RemoveInterfaceParams
+ * PageablePendingTransactionResources
  *
  * PHP version 7.4
  *
@@ -33,16 +33,16 @@ use \ArrayAccess;
 use \OpenAPIAccess\Client\ObjectSerializer;
 
 /**
- * RemoveInterfaceParams Class Doc Comment
+ * PageablePendingTransactionResources Class Doc Comment
  *
  * @category Class
- * @description Container for interface removal parameters
+ * @description Container for a page of pending transactions
  * @package  OpenAPIAccess\Client
  * @author   OpenAPI Generator team
  * @link     https://openapi-generator.tech
  * @implements \ArrayAccess<string, mixed>
  */
-class RemoveInterfaceParams implements ModelInterface, ArrayAccess, \JsonSerializable
+class PageablePendingTransactionResources implements ModelInterface, ArrayAccess, \JsonSerializable
 {
     public const DISCRIMINATOR = null;
 
@@ -51,7 +51,7 @@ class RemoveInterfaceParams implements ModelInterface, ArrayAccess, \JsonSeriali
       *
       * @var string
       */
-    protected static $openAPIModelName = 'RemoveInterfaceParams';
+    protected static $openAPIModelName = 'PageablePendingTransactionResources';
 
     /**
       * Array of property to type mappings. Used for (de)serialization
@@ -59,8 +59,8 @@ class RemoveInterfaceParams implements ModelInterface, ArrayAccess, \JsonSeriali
       * @var string[]
       */
     protected static $openAPITypes = [
-        'bank_connection_id' => 'int',
-        'banking_interface' => '\OpenAPIAccess\Client\Model\BankingInterface'
+        'pending_transactions' => '\OpenAPIAccess\Client\Model\PendingTransaction[]',
+        'paging' => '\OpenAPIAccess\Client\Model\DailyBalanceListPaging'
     ];
 
     /**
@@ -71,8 +71,8 @@ class RemoveInterfaceParams implements ModelInterface, ArrayAccess, \JsonSeriali
       * @psalm-var array<string, string|null>
       */
     protected static $openAPIFormats = [
-        'bank_connection_id' => 'int64',
-        'banking_interface' => null
+        'pending_transactions' => null,
+        'paging' => null
     ];
 
     /**
@@ -81,8 +81,8 @@ class RemoveInterfaceParams implements ModelInterface, ArrayAccess, \JsonSeriali
       * @var boolean[]
       */
     protected static array $openAPINullables = [
-        'bank_connection_id' => false,
-		'banking_interface' => false
+        'pending_transactions' => false,
+		'paging' => false
     ];
 
     /**
@@ -161,8 +161,8 @@ class RemoveInterfaceParams implements ModelInterface, ArrayAccess, \JsonSeriali
      * @var string[]
      */
     protected static $attributeMap = [
-        'bank_connection_id' => 'bankConnectionId',
-        'banking_interface' => 'bankingInterface'
+        'pending_transactions' => 'pendingTransactions',
+        'paging' => 'paging'
     ];
 
     /**
@@ -171,8 +171,8 @@ class RemoveInterfaceParams implements ModelInterface, ArrayAccess, \JsonSeriali
      * @var string[]
      */
     protected static $setters = [
-        'bank_connection_id' => 'setBankConnectionId',
-        'banking_interface' => 'setBankingInterface'
+        'pending_transactions' => 'setPendingTransactions',
+        'paging' => 'setPaging'
     ];
 
     /**
@@ -181,8 +181,8 @@ class RemoveInterfaceParams implements ModelInterface, ArrayAccess, \JsonSeriali
      * @var string[]
      */
     protected static $getters = [
-        'bank_connection_id' => 'getBankConnectionId',
-        'banking_interface' => 'getBankingInterface'
+        'pending_transactions' => 'getPendingTransactions',
+        'paging' => 'getPaging'
     ];
 
     /**
@@ -242,8 +242,8 @@ class RemoveInterfaceParams implements ModelInterface, ArrayAccess, \JsonSeriali
      */
     public function __construct(array $data = null)
     {
-        $this->setIfExists('bank_connection_id', $data ?? [], null);
-        $this->setIfExists('banking_interface', $data ?? [], null);
+        $this->setIfExists('pending_transactions', $data ?? [], null);
+        $this->setIfExists('paging', $data ?? [], null);
     }
 
     /**
@@ -273,11 +273,11 @@ class RemoveInterfaceParams implements ModelInterface, ArrayAccess, \JsonSeriali
     {
         $invalidProperties = [];
 
-        if ($this->container['bank_connection_id'] === null) {
-            $invalidProperties[] = "'bank_connection_id' can't be null";
+        if ($this->container['pending_transactions'] === null) {
+            $invalidProperties[] = "'pending_transactions' can't be null";
         }
-        if ($this->container['banking_interface'] === null) {
-            $invalidProperties[] = "'banking_interface' can't be null";
+        if ($this->container['paging'] === null) {
+            $invalidProperties[] = "'paging' can't be null";
         }
         return $invalidProperties;
     }
@@ -295,59 +295,59 @@ class RemoveInterfaceParams implements ModelInterface, ArrayAccess, \JsonSeriali
 
 
     /**
-     * Gets bank_connection_id
+     * Gets pending_transactions
      *
-     * @return int
+     * @return \OpenAPIAccess\Client\Model\PendingTransaction[]
      */
-    public function getBankConnectionId()
+    public function getPendingTransactions()
     {
-        return $this->container['bank_connection_id'];
+        return $this->container['pending_transactions'];
     }
 
     /**
-     * Sets bank_connection_id
+     * Sets pending_transactions
      *
-     * @param int $bank_connection_id Bank connection identifier
+     * @param \OpenAPIAccess\Client\Model\PendingTransaction[] $pending_transactions <strong>Type:</strong> PendingTransaction<br/> Array of pending transactions (for the requested page)
      *
      * @return self
      */
-    public function setBankConnectionId($bank_connection_id)
+    public function setPendingTransactions($pending_transactions)
     {
 
-        if (is_null($bank_connection_id)) {
-            throw new \InvalidArgumentException('non-nullable bank_connection_id cannot be null');
+        if (is_null($pending_transactions)) {
+            throw new \InvalidArgumentException('non-nullable pending_transactions cannot be null');
         }
 
-        $this->container['bank_connection_id'] = $bank_connection_id;
+        $this->container['pending_transactions'] = $pending_transactions;
 
         return $this;
     }
 
     /**
-     * Gets banking_interface
+     * Gets paging
      *
-     * @return BankingInterface
+     * @return \OpenAPIAccess\Client\Model\DailyBalanceListPaging
      */
-    public function getBankingInterface()
+    public function getPaging()
     {
-        return $this->container['banking_interface'];
+        return $this->container['paging'];
     }
 
     /**
-     * Sets banking_interface
+     * Sets paging
      *
-     * @param BankingInterface $banking_interface <strong>Type:</strong> BankingInterface<br/> The interface which you want to remove.
+     * @param \OpenAPIAccess\Client\Model\DailyBalanceListPaging $paging paging
      *
      * @return self
      */
-    public function setBankingInterface($banking_interface)
+    public function setPaging($paging)
     {
 
-        if (is_null($banking_interface)) {
-            throw new \InvalidArgumentException('non-nullable banking_interface cannot be null');
+        if (is_null($paging)) {
+            throw new \InvalidArgumentException('non-nullable paging cannot be null');
         }
 
-        $this->container['banking_interface'] = $banking_interface;
+        $this->container['paging'] = $paging;
 
         return $this;
     }
