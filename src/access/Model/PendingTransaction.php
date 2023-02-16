@@ -1,6 +1,6 @@
 <?php
 /**
- * Transaction
+ * PendingTransaction
  *
  * PHP version 7.4
  *
@@ -33,16 +33,16 @@ use \ArrayAccess;
 use \OpenAPIAccess\Client\ObjectSerializer;
 
 /**
- * Transaction Class Doc Comment
+ * PendingTransaction Class Doc Comment
  *
  * @category Class
- * @description Container for a transaction&#39;s data
+ * @description Container for a pending transaction&#39;s data
  * @package  OpenAPIAccess\Client
  * @author   OpenAPI Generator team
  * @link     https://openapi-generator.tech
  * @implements \ArrayAccess<string, mixed>
  */
-class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
+class PendingTransaction implements ModelInterface, ArrayAccess, \JsonSerializable
 {
     public const DISCRIMINATOR = null;
 
@@ -51,7 +51,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
       *
       * @var string
       */
-    protected static $openAPIModelName = 'Transaction';
+    protected static $openAPIModelName = 'PendingTransaction';
 
     /**
       * Array of property to type mappings. Used for (de)serialization
@@ -60,44 +60,36 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
       */
     protected static $openAPITypes = [
         'id' => 'int',
-        'parent_id' => 'int',
         'account_id' => 'int',
+        'import_date' => '\DateTime',
         'value_date' => '\DateTime',
         'bank_booking_date' => '\DateTime',
-        'finapi_booking_date' => '\DateTime',
         'amount' => 'float',
         'currency' => 'Currency',
         'purpose' => 'string',
-        'counterpart_name' => 'string',
-        'counterpart_account_number' => 'string',
-        'counterpart_iban' => 'string',
-        'counterpart_blz' => 'string',
-        'counterpart_bic' => 'string',
-        'counterpart_bank_name' => 'string',
-        'counterpart_mandate_reference' => 'string',
-        'counterpart_customer_reference' => 'string',
-        'counterpart_creditor_id' => 'string',
-        'counterpart_debitor_id' => 'string',
+        'counterparty_name' => 'string',
+        'counterparty_iban' => 'string',
+        'counterparty_account_number' => 'string',
+        'counterparty_blz' => 'string',
+        'counterparty_bic' => 'string',
+        'counterparty_bank_name' => 'string',
+        'counterparty_mandate_reference' => 'string',
+        'counterparty_customer_reference' => 'string',
+        'counterparty_creditor_id' => 'string',
+        'counterparty_debtor_id' => 'string',
+        'end_to_end_id' => 'string',
         'type' => 'string',
         'type_code_zka' => 'string',
         'type_code_swift' => 'string',
         'sepa_purpose_code' => 'string',
         'bank_transaction_code' => 'string',
         'primanota' => 'string',
-        'category' => '\OpenAPIAccess\Client\Model\TransactionCategory',
-        'labels' => '\OpenAPIAccess\Client\Model\Label[]',
-        'is_potential_duplicate' => 'bool',
-        'is_adjusting_entry' => 'bool',
-        'is_new' => 'bool',
-        'import_date' => '\DateTime',
-        'children' => 'int[]',
-        'paypal_data' => '\OpenAPIAccess\Client\Model\PendingTransactionPaypalData',
-        'end_to_end_reference' => 'string',
         'compensation_amount' => 'float',
         'original_amount' => 'float',
         'original_currency' => 'Currency',
-        'different_debitor' => 'string',
-        'different_creditor' => 'string'
+        'different_debtor' => 'string',
+        'different_creditor' => 'string',
+        'paypal_data' => '\OpenAPIAccess\Client\Model\PendingTransactionPaypalData'
     ];
 
     /**
@@ -109,44 +101,36 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
       */
     protected static $openAPIFormats = [
         'id' => 'int64',
-        'parent_id' => 'int64',
         'account_id' => 'int64',
+        'import_date' => 'date-time',
         'value_date' => 'date',
         'bank_booking_date' => 'date',
-        'finapi_booking_date' => 'date',
         'amount' => null,
         'currency' => null,
         'purpose' => null,
-        'counterpart_name' => null,
-        'counterpart_account_number' => null,
-        'counterpart_iban' => null,
-        'counterpart_blz' => null,
-        'counterpart_bic' => null,
-        'counterpart_bank_name' => null,
-        'counterpart_mandate_reference' => null,
-        'counterpart_customer_reference' => null,
-        'counterpart_creditor_id' => null,
-        'counterpart_debitor_id' => null,
+        'counterparty_name' => null,
+        'counterparty_iban' => null,
+        'counterparty_account_number' => null,
+        'counterparty_blz' => null,
+        'counterparty_bic' => null,
+        'counterparty_bank_name' => null,
+        'counterparty_mandate_reference' => null,
+        'counterparty_customer_reference' => null,
+        'counterparty_creditor_id' => null,
+        'counterparty_debtor_id' => null,
+        'end_to_end_id' => null,
         'type' => null,
         'type_code_zka' => null,
         'type_code_swift' => null,
         'sepa_purpose_code' => null,
         'bank_transaction_code' => null,
         'primanota' => null,
-        'category' => null,
-        'labels' => null,
-        'is_potential_duplicate' => null,
-        'is_adjusting_entry' => null,
-        'is_new' => null,
-        'import_date' => 'date-time',
-        'children' => 'int64',
-        'paypal_data' => null,
-        'end_to_end_reference' => null,
         'compensation_amount' => null,
         'original_amount' => null,
         'original_currency' => null,
-        'different_debitor' => null,
-        'different_creditor' => null
+        'different_debtor' => null,
+        'different_creditor' => null,
+        'paypal_data' => null
     ];
 
     /**
@@ -156,44 +140,36 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
       */
     protected static array $openAPINullables = [
         'id' => false,
-		'parent_id' => false,
 		'account_id' => false,
+		'import_date' => false,
 		'value_date' => false,
 		'bank_booking_date' => false,
-		'finapi_booking_date' => false,
 		'amount' => false,
 		'currency' => false,
 		'purpose' => false,
-		'counterpart_name' => false,
-		'counterpart_account_number' => false,
-		'counterpart_iban' => false,
-		'counterpart_blz' => false,
-		'counterpart_bic' => false,
-		'counterpart_bank_name' => false,
-		'counterpart_mandate_reference' => false,
-		'counterpart_customer_reference' => false,
-		'counterpart_creditor_id' => false,
-		'counterpart_debitor_id' => false,
+		'counterparty_name' => false,
+		'counterparty_iban' => false,
+		'counterparty_account_number' => false,
+		'counterparty_blz' => false,
+		'counterparty_bic' => false,
+		'counterparty_bank_name' => false,
+		'counterparty_mandate_reference' => false,
+		'counterparty_customer_reference' => false,
+		'counterparty_creditor_id' => false,
+		'counterparty_debtor_id' => false,
+		'end_to_end_id' => false,
 		'type' => false,
 		'type_code_zka' => false,
 		'type_code_swift' => false,
 		'sepa_purpose_code' => false,
 		'bank_transaction_code' => false,
 		'primanota' => false,
-		'category' => false,
-		'labels' => false,
-		'is_potential_duplicate' => false,
-		'is_adjusting_entry' => false,
-		'is_new' => false,
-		'import_date' => false,
-		'children' => false,
-		'paypal_data' => false,
-		'end_to_end_reference' => false,
 		'compensation_amount' => false,
 		'original_amount' => false,
 		'original_currency' => false,
-		'different_debitor' => false,
-		'different_creditor' => false
+		'different_debtor' => false,
+		'different_creditor' => false,
+		'paypal_data' => false
     ];
 
     /**
@@ -273,44 +249,36 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
      */
     protected static $attributeMap = [
         'id' => 'id',
-        'parent_id' => 'parentId',
         'account_id' => 'accountId',
+        'import_date' => 'importDate',
         'value_date' => 'valueDate',
         'bank_booking_date' => 'bankBookingDate',
-        'finapi_booking_date' => 'finapiBookingDate',
         'amount' => 'amount',
         'currency' => 'currency',
         'purpose' => 'purpose',
-        'counterpart_name' => 'counterpartName',
-        'counterpart_account_number' => 'counterpartAccountNumber',
-        'counterpart_iban' => 'counterpartIban',
-        'counterpart_blz' => 'counterpartBlz',
-        'counterpart_bic' => 'counterpartBic',
-        'counterpart_bank_name' => 'counterpartBankName',
-        'counterpart_mandate_reference' => 'counterpartMandateReference',
-        'counterpart_customer_reference' => 'counterpartCustomerReference',
-        'counterpart_creditor_id' => 'counterpartCreditorId',
-        'counterpart_debitor_id' => 'counterpartDebitorId',
+        'counterparty_name' => 'counterpartyName',
+        'counterparty_iban' => 'counterpartyIban',
+        'counterparty_account_number' => 'counterpartyAccountNumber',
+        'counterparty_blz' => 'counterpartyBlz',
+        'counterparty_bic' => 'counterpartyBic',
+        'counterparty_bank_name' => 'counterpartyBankName',
+        'counterparty_mandate_reference' => 'counterpartyMandateReference',
+        'counterparty_customer_reference' => 'counterpartyCustomerReference',
+        'counterparty_creditor_id' => 'counterpartyCreditorId',
+        'counterparty_debtor_id' => 'counterpartyDebtorId',
+        'end_to_end_id' => 'endToEndId',
         'type' => 'type',
         'type_code_zka' => 'typeCodeZka',
         'type_code_swift' => 'typeCodeSwift',
         'sepa_purpose_code' => 'sepaPurposeCode',
         'bank_transaction_code' => 'bankTransactionCode',
         'primanota' => 'primanota',
-        'category' => 'category',
-        'labels' => 'labels',
-        'is_potential_duplicate' => 'isPotentialDuplicate',
-        'is_adjusting_entry' => 'isAdjustingEntry',
-        'is_new' => 'isNew',
-        'import_date' => 'importDate',
-        'children' => 'children',
-        'paypal_data' => 'paypalData',
-        'end_to_end_reference' => 'endToEndReference',
         'compensation_amount' => 'compensationAmount',
         'original_amount' => 'originalAmount',
         'original_currency' => 'originalCurrency',
-        'different_debitor' => 'differentDebitor',
-        'different_creditor' => 'differentCreditor'
+        'different_debtor' => 'differentDebtor',
+        'different_creditor' => 'differentCreditor',
+        'paypal_data' => 'paypalData'
     ];
 
     /**
@@ -320,44 +288,36 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
      */
     protected static $setters = [
         'id' => 'setId',
-        'parent_id' => 'setParentId',
         'account_id' => 'setAccountId',
+        'import_date' => 'setImportDate',
         'value_date' => 'setValueDate',
         'bank_booking_date' => 'setBankBookingDate',
-        'finapi_booking_date' => 'setFinapiBookingDate',
         'amount' => 'setAmount',
         'currency' => 'setCurrency',
         'purpose' => 'setPurpose',
-        'counterpart_name' => 'setCounterpartName',
-        'counterpart_account_number' => 'setCounterpartAccountNumber',
-        'counterpart_iban' => 'setCounterpartIban',
-        'counterpart_blz' => 'setCounterpartBlz',
-        'counterpart_bic' => 'setCounterpartBic',
-        'counterpart_bank_name' => 'setCounterpartBankName',
-        'counterpart_mandate_reference' => 'setCounterpartMandateReference',
-        'counterpart_customer_reference' => 'setCounterpartCustomerReference',
-        'counterpart_creditor_id' => 'setCounterpartCreditorId',
-        'counterpart_debitor_id' => 'setCounterpartDebitorId',
+        'counterparty_name' => 'setCounterpartyName',
+        'counterparty_iban' => 'setCounterpartyIban',
+        'counterparty_account_number' => 'setCounterpartyAccountNumber',
+        'counterparty_blz' => 'setCounterpartyBlz',
+        'counterparty_bic' => 'setCounterpartyBic',
+        'counterparty_bank_name' => 'setCounterpartyBankName',
+        'counterparty_mandate_reference' => 'setCounterpartyMandateReference',
+        'counterparty_customer_reference' => 'setCounterpartyCustomerReference',
+        'counterparty_creditor_id' => 'setCounterpartyCreditorId',
+        'counterparty_debtor_id' => 'setCounterpartyDebtorId',
+        'end_to_end_id' => 'setEndToEndId',
         'type' => 'setType',
         'type_code_zka' => 'setTypeCodeZka',
         'type_code_swift' => 'setTypeCodeSwift',
         'sepa_purpose_code' => 'setSepaPurposeCode',
         'bank_transaction_code' => 'setBankTransactionCode',
         'primanota' => 'setPrimanota',
-        'category' => 'setCategory',
-        'labels' => 'setLabels',
-        'is_potential_duplicate' => 'setIsPotentialDuplicate',
-        'is_adjusting_entry' => 'setIsAdjustingEntry',
-        'is_new' => 'setIsNew',
-        'import_date' => 'setImportDate',
-        'children' => 'setChildren',
-        'paypal_data' => 'setPaypalData',
-        'end_to_end_reference' => 'setEndToEndReference',
         'compensation_amount' => 'setCompensationAmount',
         'original_amount' => 'setOriginalAmount',
         'original_currency' => 'setOriginalCurrency',
-        'different_debitor' => 'setDifferentDebitor',
-        'different_creditor' => 'setDifferentCreditor'
+        'different_debtor' => 'setDifferentDebtor',
+        'different_creditor' => 'setDifferentCreditor',
+        'paypal_data' => 'setPaypalData'
     ];
 
     /**
@@ -367,44 +327,36 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
      */
     protected static $getters = [
         'id' => 'getId',
-        'parent_id' => 'getParentId',
         'account_id' => 'getAccountId',
+        'import_date' => 'getImportDate',
         'value_date' => 'getValueDate',
         'bank_booking_date' => 'getBankBookingDate',
-        'finapi_booking_date' => 'getFinapiBookingDate',
         'amount' => 'getAmount',
         'currency' => 'getCurrency',
         'purpose' => 'getPurpose',
-        'counterpart_name' => 'getCounterpartName',
-        'counterpart_account_number' => 'getCounterpartAccountNumber',
-        'counterpart_iban' => 'getCounterpartIban',
-        'counterpart_blz' => 'getCounterpartBlz',
-        'counterpart_bic' => 'getCounterpartBic',
-        'counterpart_bank_name' => 'getCounterpartBankName',
-        'counterpart_mandate_reference' => 'getCounterpartMandateReference',
-        'counterpart_customer_reference' => 'getCounterpartCustomerReference',
-        'counterpart_creditor_id' => 'getCounterpartCreditorId',
-        'counterpart_debitor_id' => 'getCounterpartDebitorId',
+        'counterparty_name' => 'getCounterpartyName',
+        'counterparty_iban' => 'getCounterpartyIban',
+        'counterparty_account_number' => 'getCounterpartyAccountNumber',
+        'counterparty_blz' => 'getCounterpartyBlz',
+        'counterparty_bic' => 'getCounterpartyBic',
+        'counterparty_bank_name' => 'getCounterpartyBankName',
+        'counterparty_mandate_reference' => 'getCounterpartyMandateReference',
+        'counterparty_customer_reference' => 'getCounterpartyCustomerReference',
+        'counterparty_creditor_id' => 'getCounterpartyCreditorId',
+        'counterparty_debtor_id' => 'getCounterpartyDebtorId',
+        'end_to_end_id' => 'getEndToEndId',
         'type' => 'getType',
         'type_code_zka' => 'getTypeCodeZka',
         'type_code_swift' => 'getTypeCodeSwift',
         'sepa_purpose_code' => 'getSepaPurposeCode',
         'bank_transaction_code' => 'getBankTransactionCode',
         'primanota' => 'getPrimanota',
-        'category' => 'getCategory',
-        'labels' => 'getLabels',
-        'is_potential_duplicate' => 'getIsPotentialDuplicate',
-        'is_adjusting_entry' => 'getIsAdjustingEntry',
-        'is_new' => 'getIsNew',
-        'import_date' => 'getImportDate',
-        'children' => 'getChildren',
-        'paypal_data' => 'getPaypalData',
-        'end_to_end_reference' => 'getEndToEndReference',
         'compensation_amount' => 'getCompensationAmount',
         'original_amount' => 'getOriginalAmount',
         'original_currency' => 'getOriginalCurrency',
-        'different_debitor' => 'getDifferentDebitor',
-        'different_creditor' => 'getDifferentCreditor'
+        'different_debtor' => 'getDifferentDebtor',
+        'different_creditor' => 'getDifferentCreditor',
+        'paypal_data' => 'getPaypalData'
     ];
 
     /**
@@ -465,44 +417,36 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     public function __construct(array $data = null)
     {
         $this->setIfExists('id', $data ?? [], null);
-        $this->setIfExists('parent_id', $data ?? [], null);
         $this->setIfExists('account_id', $data ?? [], null);
+        $this->setIfExists('import_date', $data ?? [], null);
         $this->setIfExists('value_date', $data ?? [], null);
         $this->setIfExists('bank_booking_date', $data ?? [], null);
-        $this->setIfExists('finapi_booking_date', $data ?? [], null);
         $this->setIfExists('amount', $data ?? [], null);
         $this->setIfExists('currency', $data ?? [], null);
         $this->setIfExists('purpose', $data ?? [], null);
-        $this->setIfExists('counterpart_name', $data ?? [], null);
-        $this->setIfExists('counterpart_account_number', $data ?? [], null);
-        $this->setIfExists('counterpart_iban', $data ?? [], null);
-        $this->setIfExists('counterpart_blz', $data ?? [], null);
-        $this->setIfExists('counterpart_bic', $data ?? [], null);
-        $this->setIfExists('counterpart_bank_name', $data ?? [], null);
-        $this->setIfExists('counterpart_mandate_reference', $data ?? [], null);
-        $this->setIfExists('counterpart_customer_reference', $data ?? [], null);
-        $this->setIfExists('counterpart_creditor_id', $data ?? [], null);
-        $this->setIfExists('counterpart_debitor_id', $data ?? [], null);
+        $this->setIfExists('counterparty_name', $data ?? [], null);
+        $this->setIfExists('counterparty_iban', $data ?? [], null);
+        $this->setIfExists('counterparty_account_number', $data ?? [], null);
+        $this->setIfExists('counterparty_blz', $data ?? [], null);
+        $this->setIfExists('counterparty_bic', $data ?? [], null);
+        $this->setIfExists('counterparty_bank_name', $data ?? [], null);
+        $this->setIfExists('counterparty_mandate_reference', $data ?? [], null);
+        $this->setIfExists('counterparty_customer_reference', $data ?? [], null);
+        $this->setIfExists('counterparty_creditor_id', $data ?? [], null);
+        $this->setIfExists('counterparty_debtor_id', $data ?? [], null);
+        $this->setIfExists('end_to_end_id', $data ?? [], null);
         $this->setIfExists('type', $data ?? [], null);
         $this->setIfExists('type_code_zka', $data ?? [], null);
         $this->setIfExists('type_code_swift', $data ?? [], null);
         $this->setIfExists('sepa_purpose_code', $data ?? [], null);
         $this->setIfExists('bank_transaction_code', $data ?? [], null);
         $this->setIfExists('primanota', $data ?? [], null);
-        $this->setIfExists('category', $data ?? [], null);
-        $this->setIfExists('labels', $data ?? [], null);
-        $this->setIfExists('is_potential_duplicate', $data ?? [], null);
-        $this->setIfExists('is_adjusting_entry', $data ?? [], null);
-        $this->setIfExists('is_new', $data ?? [], null);
-        $this->setIfExists('import_date', $data ?? [], null);
-        $this->setIfExists('children', $data ?? [], null);
-        $this->setIfExists('paypal_data', $data ?? [], null);
-        $this->setIfExists('end_to_end_reference', $data ?? [], null);
         $this->setIfExists('compensation_amount', $data ?? [], null);
         $this->setIfExists('original_amount', $data ?? [], null);
         $this->setIfExists('original_currency', $data ?? [], null);
-        $this->setIfExists('different_debitor', $data ?? [], null);
+        $this->setIfExists('different_debtor', $data ?? [], null);
         $this->setIfExists('different_creditor', $data ?? [], null);
+        $this->setIfExists('paypal_data', $data ?? [], null);
     }
 
     /**
@@ -538,32 +482,14 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
         if ($this->container['account_id'] === null) {
             $invalidProperties[] = "'account_id' can't be null";
         }
+        if ($this->container['import_date'] === null) {
+            $invalidProperties[] = "'import_date' can't be null";
+        }
         if ($this->container['value_date'] === null) {
             $invalidProperties[] = "'value_date' can't be null";
         }
-        if ($this->container['bank_booking_date'] === null) {
-            $invalidProperties[] = "'bank_booking_date' can't be null";
-        }
-        if ($this->container['finapi_booking_date'] === null) {
-            $invalidProperties[] = "'finapi_booking_date' can't be null";
-        }
         if ($this->container['amount'] === null) {
             $invalidProperties[] = "'amount' can't be null";
-        }
-        if ($this->container['labels'] === null) {
-            $invalidProperties[] = "'labels' can't be null";
-        }
-        if ($this->container['is_potential_duplicate'] === null) {
-            $invalidProperties[] = "'is_potential_duplicate' can't be null";
-        }
-        if ($this->container['is_adjusting_entry'] === null) {
-            $invalidProperties[] = "'is_adjusting_entry' can't be null";
-        }
-        if ($this->container['is_new'] === null) {
-            $invalidProperties[] = "'is_new' can't be null";
-        }
-        if ($this->container['import_date'] === null) {
-            $invalidProperties[] = "'import_date' can't be null";
         }
         return $invalidProperties;
     }
@@ -593,7 +519,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets id
      *
-     * @param int $id Transaction identifier
+     * @param int $id Pending transaction identifier
      *
      * @return self
      */
@@ -605,35 +531,6 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
         }
 
         $this->container['id'] = $id;
-
-        return $this;
-    }
-
-    /**
-     * Gets parent_id
-     *
-     * @return int|null
-     */
-    public function getParentId()
-    {
-        return $this->container['parent_id'];
-    }
-
-    /**
-     * Sets parent_id
-     *
-     * @param int|null $parent_id Parent transaction identifier
-     *
-     * @return self
-     */
-    public function setParentId($parent_id)
-    {
-
-        if (is_null($parent_id)) {
-            throw new \InvalidArgumentException('non-nullable parent_id cannot be null');
-        }
-
-        $this->container['parent_id'] = $parent_id;
 
         return $this;
     }
@@ -663,6 +560,35 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
         }
 
         $this->container['account_id'] = $account_id;
+
+        return $this;
+    }
+
+    /**
+     * Gets import_date
+     *
+     * @return \DateTime
+     */
+    public function getImportDate()
+    {
+        return $this->container['import_date'];
+    }
+
+    /**
+     * Sets import_date
+     *
+     * @param \DateTime $import_date <strong>Format:</strong> 'YYYY-MM-DD'T'HH:MM:SS.SSSXXX' (RFC 3339, section 5.6)<br/>Date of transaction import.
+     *
+     * @return self
+     */
+    public function setImportDate($import_date)
+    {
+
+        if (is_null($import_date)) {
+            throw new \InvalidArgumentException('non-nullable import_date cannot be null');
+        }
+
+        $this->container['import_date'] = $import_date;
 
         return $this;
     }
@@ -699,7 +625,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Gets bank_booking_date
      *
-     * @return \DateTime
+     * @return \DateTime|null
      */
     public function getBankBookingDate()
     {
@@ -709,7 +635,7 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     /**
      * Sets bank_booking_date
      *
-     * @param \DateTime $bank_booking_date <strong>Format:</strong> 'YYYY-MM-DD'<br/>Bank booking date.
+     * @param \DateTime|null $bank_booking_date <strong>Format:</strong> 'YYYY-MM-DD'<br/>Bank booking date.
      *
      * @return self
      */
@@ -721,35 +647,6 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
         }
 
         $this->container['bank_booking_date'] = $bank_booking_date;
-
-        return $this;
-    }
-
-    /**
-     * Gets finapi_booking_date
-     *
-     * @return \DateTime
-     */
-    public function getFinapiBookingDate()
-    {
-        return $this->container['finapi_booking_date'];
-    }
-
-    /**
-     * Sets finapi_booking_date
-     *
-     * @param \DateTime $finapi_booking_date <strong>Format:</strong> 'YYYY-MM-DD'<br/>finAPI Booking date. NOTE: In some cases, banks may deliver transactions that are booked in future, but already included in the current account balance. To keep the account balance consistent with the set of transactions, such \"future transactions\" will be imported with their finapiBookingDate set to the current date (i.e.: date of import). The finapiBookingDate will automatically get adjusted towards the bankBookingDate each time the associated bank account is updated. Example: A transaction is imported on July, 3rd, with a bank reported booking date of July, 6th. The transaction will be imported with its finapiBookingDate set to July, 3rd. Then, on July 4th, the associated account is updated. During this update, the transaction's finapiBookingDate will be automatically adjusted to July 4th. This adjustment of the finapiBookingDate takes place on each update until the bank account is updated on July 6th or later, in which case the transaction's finapiBookingDate will be adjusted to its final value, July 6th.<br/> The finapiBookingDate is the date that is used by the finAPI PFM services. E.g. when you calculate the spendings of an account for the current month, and have a transaction with finapiBookingDate in the current month but bankBookingDate at the beginning of the next month, then this transaction is included in the calculations (as the bank has this transaction's amount included in the current account balance as well).
-     *
-     * @return self
-     */
-    public function setFinapiBookingDate($finapi_booking_date)
-    {
-
-        if (is_null($finapi_booking_date)) {
-            throw new \InvalidArgumentException('non-nullable finapi_booking_date cannot be null');
-        }
-
-        $this->container['finapi_booking_date'] = $finapi_booking_date;
 
         return $this;
     }
@@ -842,291 +739,320 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     }
 
     /**
-     * Gets counterpart_name
+     * Gets counterparty_name
      *
      * @return string|null
      */
-    public function getCounterpartName()
+    public function getCounterpartyName()
     {
-        return $this->container['counterpart_name'];
+        return $this->container['counterparty_name'];
     }
 
     /**
-     * Sets counterpart_name
+     * Sets counterparty_name
      *
-     * @param string|null $counterpart_name Counterpart name. Maximum length: 80
+     * @param string|null $counterparty_name Counterparty name. Maximum length: 80
      *
      * @return self
      */
-    public function setCounterpartName($counterpart_name)
+    public function setCounterpartyName($counterparty_name)
     {
 
-        if (is_null($counterpart_name)) {
-            throw new \InvalidArgumentException('non-nullable counterpart_name cannot be null');
+        if (is_null($counterparty_name)) {
+            throw new \InvalidArgumentException('non-nullable counterparty_name cannot be null');
         }
 
-        $this->container['counterpart_name'] = $counterpart_name;
+        $this->container['counterparty_name'] = $counterparty_name;
 
         return $this;
     }
 
     /**
-     * Gets counterpart_account_number
+     * Gets counterparty_iban
      *
      * @return string|null
      */
-    public function getCounterpartAccountNumber()
+    public function getCounterpartyIban()
     {
-        return $this->container['counterpart_account_number'];
+        return $this->container['counterparty_iban'];
     }
 
     /**
-     * Sets counterpart_account_number
+     * Sets counterparty_iban
      *
-     * @param string|null $counterpart_account_number Counterpart account number
+     * @param string|null $counterparty_iban Counterparty IBAN
      *
      * @return self
      */
-    public function setCounterpartAccountNumber($counterpart_account_number)
+    public function setCounterpartyIban($counterparty_iban)
     {
 
-        if (is_null($counterpart_account_number)) {
-            throw new \InvalidArgumentException('non-nullable counterpart_account_number cannot be null');
+        if (is_null($counterparty_iban)) {
+            throw new \InvalidArgumentException('non-nullable counterparty_iban cannot be null');
         }
 
-        $this->container['counterpart_account_number'] = $counterpart_account_number;
+        $this->container['counterparty_iban'] = $counterparty_iban;
 
         return $this;
     }
 
     /**
-     * Gets counterpart_iban
+     * Gets counterparty_account_number
      *
      * @return string|null
      */
-    public function getCounterpartIban()
+    public function getCounterpartyAccountNumber()
     {
-        return $this->container['counterpart_iban'];
+        return $this->container['counterparty_account_number'];
     }
 
     /**
-     * Sets counterpart_iban
+     * Sets counterparty_account_number
      *
-     * @param string|null $counterpart_iban Counterpart IBAN
+     * @param string|null $counterparty_account_number Counterparty account number
      *
      * @return self
      */
-    public function setCounterpartIban($counterpart_iban)
+    public function setCounterpartyAccountNumber($counterparty_account_number)
     {
 
-        if (is_null($counterpart_iban)) {
-            throw new \InvalidArgumentException('non-nullable counterpart_iban cannot be null');
+        if (is_null($counterparty_account_number)) {
+            throw new \InvalidArgumentException('non-nullable counterparty_account_number cannot be null');
         }
 
-        $this->container['counterpart_iban'] = $counterpart_iban;
+        $this->container['counterparty_account_number'] = $counterparty_account_number;
 
         return $this;
     }
 
     /**
-     * Gets counterpart_blz
+     * Gets counterparty_blz
      *
      * @return string|null
      */
-    public function getCounterpartBlz()
+    public function getCounterpartyBlz()
     {
-        return $this->container['counterpart_blz'];
+        return $this->container['counterparty_blz'];
     }
 
     /**
-     * Sets counterpart_blz
+     * Sets counterparty_blz
      *
-     * @param string|null $counterpart_blz Counterpart BLZ
+     * @param string|null $counterparty_blz Counterparty BLZ
      *
      * @return self
      */
-    public function setCounterpartBlz($counterpart_blz)
+    public function setCounterpartyBlz($counterparty_blz)
     {
 
-        if (is_null($counterpart_blz)) {
-            throw new \InvalidArgumentException('non-nullable counterpart_blz cannot be null');
+        if (is_null($counterparty_blz)) {
+            throw new \InvalidArgumentException('non-nullable counterparty_blz cannot be null');
         }
 
-        $this->container['counterpart_blz'] = $counterpart_blz;
+        $this->container['counterparty_blz'] = $counterparty_blz;
 
         return $this;
     }
 
     /**
-     * Gets counterpart_bic
+     * Gets counterparty_bic
      *
      * @return string|null
      */
-    public function getCounterpartBic()
+    public function getCounterpartyBic()
     {
-        return $this->container['counterpart_bic'];
+        return $this->container['counterparty_bic'];
     }
 
     /**
-     * Sets counterpart_bic
+     * Sets counterparty_bic
      *
-     * @param string|null $counterpart_bic Counterpart BIC
+     * @param string|null $counterparty_bic Counterparty BIC
      *
      * @return self
      */
-    public function setCounterpartBic($counterpart_bic)
+    public function setCounterpartyBic($counterparty_bic)
     {
 
-        if (is_null($counterpart_bic)) {
-            throw new \InvalidArgumentException('non-nullable counterpart_bic cannot be null');
+        if (is_null($counterparty_bic)) {
+            throw new \InvalidArgumentException('non-nullable counterparty_bic cannot be null');
         }
 
-        $this->container['counterpart_bic'] = $counterpart_bic;
+        $this->container['counterparty_bic'] = $counterparty_bic;
 
         return $this;
     }
 
     /**
-     * Gets counterpart_bank_name
+     * Gets counterparty_bank_name
      *
      * @return string|null
      */
-    public function getCounterpartBankName()
+    public function getCounterpartyBankName()
     {
-        return $this->container['counterpart_bank_name'];
+        return $this->container['counterparty_bank_name'];
     }
 
     /**
-     * Sets counterpart_bank_name
+     * Sets counterparty_bank_name
      *
-     * @param string|null $counterpart_bank_name Counterpart Bank name
+     * @param string|null $counterparty_bank_name Counterparty Bank name
      *
      * @return self
      */
-    public function setCounterpartBankName($counterpart_bank_name)
+    public function setCounterpartyBankName($counterparty_bank_name)
     {
 
-        if (is_null($counterpart_bank_name)) {
-            throw new \InvalidArgumentException('non-nullable counterpart_bank_name cannot be null');
+        if (is_null($counterparty_bank_name)) {
+            throw new \InvalidArgumentException('non-nullable counterparty_bank_name cannot be null');
         }
 
-        $this->container['counterpart_bank_name'] = $counterpart_bank_name;
+        $this->container['counterparty_bank_name'] = $counterparty_bank_name;
 
         return $this;
     }
 
     /**
-     * Gets counterpart_mandate_reference
+     * Gets counterparty_mandate_reference
      *
      * @return string|null
      */
-    public function getCounterpartMandateReference()
+    public function getCounterpartyMandateReference()
     {
-        return $this->container['counterpart_mandate_reference'];
+        return $this->container['counterparty_mandate_reference'];
     }
 
     /**
-     * Sets counterpart_mandate_reference
+     * Sets counterparty_mandate_reference
      *
-     * @param string|null $counterpart_mandate_reference The mandate reference of the counterpart
+     * @param string|null $counterparty_mandate_reference The mandate reference of the counterparty
      *
      * @return self
      */
-    public function setCounterpartMandateReference($counterpart_mandate_reference)
+    public function setCounterpartyMandateReference($counterparty_mandate_reference)
     {
 
-        if (is_null($counterpart_mandate_reference)) {
-            throw new \InvalidArgumentException('non-nullable counterpart_mandate_reference cannot be null');
+        if (is_null($counterparty_mandate_reference)) {
+            throw new \InvalidArgumentException('non-nullable counterparty_mandate_reference cannot be null');
         }
 
-        $this->container['counterpart_mandate_reference'] = $counterpart_mandate_reference;
+        $this->container['counterparty_mandate_reference'] = $counterparty_mandate_reference;
 
         return $this;
     }
 
     /**
-     * Gets counterpart_customer_reference
+     * Gets counterparty_customer_reference
      *
      * @return string|null
      */
-    public function getCounterpartCustomerReference()
+    public function getCounterpartyCustomerReference()
     {
-        return $this->container['counterpart_customer_reference'];
+        return $this->container['counterparty_customer_reference'];
     }
 
     /**
-     * Sets counterpart_customer_reference
+     * Sets counterparty_customer_reference
      *
-     * @param string|null $counterpart_customer_reference The customer reference of the counterpart
+     * @param string|null $counterparty_customer_reference The customer reference of the counterparty
      *
      * @return self
      */
-    public function setCounterpartCustomerReference($counterpart_customer_reference)
+    public function setCounterpartyCustomerReference($counterparty_customer_reference)
     {
 
-        if (is_null($counterpart_customer_reference)) {
-            throw new \InvalidArgumentException('non-nullable counterpart_customer_reference cannot be null');
+        if (is_null($counterparty_customer_reference)) {
+            throw new \InvalidArgumentException('non-nullable counterparty_customer_reference cannot be null');
         }
 
-        $this->container['counterpart_customer_reference'] = $counterpart_customer_reference;
+        $this->container['counterparty_customer_reference'] = $counterparty_customer_reference;
 
         return $this;
     }
 
     /**
-     * Gets counterpart_creditor_id
+     * Gets counterparty_creditor_id
      *
      * @return string|null
      */
-    public function getCounterpartCreditorId()
+    public function getCounterpartyCreditorId()
     {
-        return $this->container['counterpart_creditor_id'];
+        return $this->container['counterparty_creditor_id'];
     }
 
     /**
-     * Sets counterpart_creditor_id
+     * Sets counterparty_creditor_id
      *
-     * @param string|null $counterpart_creditor_id The creditor ID of the counterpart. Exists only for SEPA direct debit transactions (\"Lastschrift\").
+     * @param string|null $counterparty_creditor_id The creditor ID of the counterparty. Exists only for SEPA direct debit transactions (\"Lastschrift\").
      *
      * @return self
      */
-    public function setCounterpartCreditorId($counterpart_creditor_id)
+    public function setCounterpartyCreditorId($counterparty_creditor_id)
     {
 
-        if (is_null($counterpart_creditor_id)) {
-            throw new \InvalidArgumentException('non-nullable counterpart_creditor_id cannot be null');
+        if (is_null($counterparty_creditor_id)) {
+            throw new \InvalidArgumentException('non-nullable counterparty_creditor_id cannot be null');
         }
 
-        $this->container['counterpart_creditor_id'] = $counterpart_creditor_id;
+        $this->container['counterparty_creditor_id'] = $counterparty_creditor_id;
 
         return $this;
     }
 
     /**
-     * Gets counterpart_debitor_id
+     * Gets counterparty_debtor_id
      *
      * @return string|null
      */
-    public function getCounterpartDebitorId()
+    public function getCounterpartyDebtorId()
     {
-        return $this->container['counterpart_debitor_id'];
+        return $this->container['counterparty_debtor_id'];
     }
 
     /**
-     * Sets counterpart_debitor_id
+     * Sets counterparty_debtor_id
      *
-     * @param string|null $counterpart_debitor_id The originator's identification code. Exists only for SEPA money transfer transactions (\"Überweisung\").
+     * @param string|null $counterparty_debtor_id The originator's identification code. Exists only for SEPA money transfer transactions (\"Überweisung\").
      *
      * @return self
      */
-    public function setCounterpartDebitorId($counterpart_debitor_id)
+    public function setCounterpartyDebtorId($counterparty_debtor_id)
     {
 
-        if (is_null($counterpart_debitor_id)) {
-            throw new \InvalidArgumentException('non-nullable counterpart_debitor_id cannot be null');
+        if (is_null($counterparty_debtor_id)) {
+            throw new \InvalidArgumentException('non-nullable counterparty_debtor_id cannot be null');
         }
 
-        $this->container['counterpart_debitor_id'] = $counterpart_debitor_id;
+        $this->container['counterparty_debtor_id'] = $counterparty_debtor_id;
+
+        return $this;
+    }
+
+    /**
+     * Gets end_to_end_id
+     *
+     * @return string|null
+     */
+    public function getEndToEndId()
+    {
+        return $this->container['end_to_end_id'];
+    }
+
+    /**
+     * Sets end_to_end_id
+     *
+     * @param string|null $end_to_end_id End-To-End ID
+     *
+     * @return self
+     */
+    public function setEndToEndId($end_to_end_id)
+    {
+
+        if (is_null($end_to_end_id)) {
+            throw new \InvalidArgumentException('non-nullable end_to_end_id cannot be null');
+        }
+
+        $this->container['end_to_end_id'] = $end_to_end_id;
 
         return $this;
     }
@@ -1306,267 +1232,6 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     }
 
     /**
-     * Gets category
-     *
-     * @return \OpenAPIAccess\Client\Model\TransactionCategory|null
-     */
-    public function getCategory()
-    {
-        return $this->container['category'];
-    }
-
-    /**
-     * Sets category
-     *
-     * @param \OpenAPIAccess\Client\Model\TransactionCategory|null $category category
-     *
-     * @return self
-     */
-    public function setCategory($category)
-    {
-
-        if (is_null($category)) {
-            throw new \InvalidArgumentException('non-nullable category cannot be null');
-        }
-
-        $this->container['category'] = $category;
-
-        return $this;
-    }
-
-    /**
-     * Gets labels
-     *
-     * @return \OpenAPIAccess\Client\Model\Label[]
-     */
-    public function getLabels()
-    {
-        return $this->container['labels'];
-    }
-
-    /**
-     * Sets labels
-     *
-     * @param \OpenAPIAccess\Client\Model\Label[] $labels <strong>Type:</strong> Label<br/> Array of assigned labels
-     *
-     * @return self
-     */
-    public function setLabels($labels)
-    {
-
-        if (is_null($labels)) {
-            throw new \InvalidArgumentException('non-nullable labels cannot be null');
-        }
-
-        $this->container['labels'] = $labels;
-
-        return $this;
-    }
-
-    /**
-     * Gets is_potential_duplicate
-     *
-     * @return bool
-     */
-    public function getIsPotentialDuplicate()
-    {
-        return $this->container['is_potential_duplicate'];
-    }
-
-    /**
-     * Sets is_potential_duplicate
-     *
-     * @param bool $is_potential_duplicate While finAPI uses a well-elaborated algorithm for uniquely identifying transactions, there is still the possibility that during an account update, a transaction that was imported previously may be imported a second time as a new transaction. For example, this can happen if some transaction data changes on the bank server side. However, finAPI also includes an algorithm of identifying such \"potential duplicate\" transactions. If this field is set to true, it means that finAPI detected a similar transaction that might actually be the same. It is recommended to communicate this information to the end user, and give him an option to delete the transaction in case he confirms that it really is a duplicate.
-     *
-     * @return self
-     */
-    public function setIsPotentialDuplicate($is_potential_duplicate)
-    {
-
-        if (is_null($is_potential_duplicate)) {
-            throw new \InvalidArgumentException('non-nullable is_potential_duplicate cannot be null');
-        }
-
-        $this->container['is_potential_duplicate'] = $is_potential_duplicate;
-
-        return $this;
-    }
-
-    /**
-     * Gets is_adjusting_entry
-     *
-     * @return bool
-     */
-    public function getIsAdjustingEntry()
-    {
-        return $this->container['is_adjusting_entry'];
-    }
-
-    /**
-     * Sets is_adjusting_entry
-     *
-     * @param bool $is_adjusting_entry Indicating whether this transaction is an adjusting entry ('Zwischensaldo').<br/><br/>Adjusting entries do not originate from the bank, but are added by finAPI during an account update when the bank reported account balance does not add up to the set of transactions that finAPI receives for the account. In this case, the adjusting entry will fix the deviation between the balance and the received transactions so that both adds up again.<br/><br/>Possible causes for such deviations are:<br/>- Inconsistencies in how the bank calculates the balance, for instance when not yet booked transactions are already included in the balance, but not included in the set of transactions<br/>- Gaps in the transaction history that finAPI receives, for instance because the account has not been updated for a while and older transactions are no longer available
-     *
-     * @return self
-     */
-    public function setIsAdjustingEntry($is_adjusting_entry)
-    {
-
-        if (is_null($is_adjusting_entry)) {
-            throw new \InvalidArgumentException('non-nullable is_adjusting_entry cannot be null');
-        }
-
-        $this->container['is_adjusting_entry'] = $is_adjusting_entry;
-
-        return $this;
-    }
-
-    /**
-     * Gets is_new
-     *
-     * @return bool
-     */
-    public function getIsNew()
-    {
-        return $this->container['is_new'];
-    }
-
-    /**
-     * Sets is_new
-     *
-     * @param bool $is_new Indicating whether this transaction is 'new' or not. Any newly imported transaction will have this flag initially set to true. How you use this field is up to your interpretation. For example, you might want to set it to false once a user has clicked on/seen the transaction. You can change this flag to 'false' with the PATCH method.
-     *
-     * @return self
-     */
-    public function setIsNew($is_new)
-    {
-
-        if (is_null($is_new)) {
-            throw new \InvalidArgumentException('non-nullable is_new cannot be null');
-        }
-
-        $this->container['is_new'] = $is_new;
-
-        return $this;
-    }
-
-    /**
-     * Gets import_date
-     *
-     * @return \DateTime
-     */
-    public function getImportDate()
-    {
-        return $this->container['import_date'];
-    }
-
-    /**
-     * Sets import_date
-     *
-     * @param \DateTime $import_date <strong>Format:</strong> 'YYYY-MM-DD'T'HH:MM:SS.SSSXXX' (RFC 3339, section 5.6)<br/>Date of transaction import.
-     *
-     * @return self
-     */
-    public function setImportDate($import_date)
-    {
-
-        if (is_null($import_date)) {
-            throw new \InvalidArgumentException('non-nullable import_date cannot be null');
-        }
-
-        $this->container['import_date'] = $import_date;
-
-        return $this;
-    }
-
-    /**
-     * Gets children
-     *
-     * @return int[]|null
-     */
-    public function getChildren()
-    {
-        return $this->container['children'];
-    }
-
-    /**
-     * Sets children
-     *
-     * @param int[]|null $children Sub-transactions identifiers (if this transaction is split)
-     *
-     * @return self
-     */
-    public function setChildren($children)
-    {
-
-        if (is_null($children)) {
-            throw new \InvalidArgumentException('non-nullable children cannot be null');
-        }
-
-        $this->container['children'] = $children;
-
-        return $this;
-    }
-
-    /**
-     * Gets paypal_data
-     *
-     * @return \OpenAPIAccess\Client\Model\PendingTransactionPaypalData|null
-     */
-    public function getPaypalData()
-    {
-        return $this->container['paypal_data'];
-    }
-
-    /**
-     * Sets paypal_data
-     *
-     * @param \OpenAPIAccess\Client\Model\PendingTransactionPaypalData|null $paypal_data paypal_data
-     *
-     * @return self
-     */
-    public function setPaypalData($paypal_data)
-    {
-
-        if (is_null($paypal_data)) {
-            throw new \InvalidArgumentException('non-nullable paypal_data cannot be null');
-        }
-
-        $this->container['paypal_data'] = $paypal_data;
-
-        return $this;
-    }
-
-    /**
-     * Gets end_to_end_reference
-     *
-     * @return string|null
-     */
-    public function getEndToEndReference()
-    {
-        return $this->container['end_to_end_reference'];
-    }
-
-    /**
-     * Sets end_to_end_reference
-     *
-     * @param string|null $end_to_end_reference End-To-End reference
-     *
-     * @return self
-     */
-    public function setEndToEndReference($end_to_end_reference)
-    {
-
-        if (is_null($end_to_end_reference)) {
-            throw new \InvalidArgumentException('non-nullable end_to_end_reference cannot be null');
-        }
-
-        $this->container['end_to_end_reference'] = $end_to_end_reference;
-
-        return $this;
-    }
-
-    /**
      * Gets compensation_amount
      *
      * @return float|null
@@ -1654,30 +1319,30 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
     }
 
     /**
-     * Gets different_debitor
+     * Gets different_debtor
      *
      * @return string|null
      */
-    public function getDifferentDebitor()
+    public function getDifferentDebtor()
     {
-        return $this->container['different_debitor'];
+        return $this->container['different_debtor'];
     }
 
     /**
-     * Sets different_debitor
+     * Sets different_debtor
      *
-     * @param string|null $different_debitor Payer's/debtor's reference party (in the case of a credit transfer) or payee's/creditor's reference party (in the case of a direct debit)
+     * @param string|null $different_debtor Payer's/debtor's reference party (in the case of a credit transfer) or payee's/creditor's reference party (in the case of a direct debit)
      *
      * @return self
      */
-    public function setDifferentDebitor($different_debitor)
+    public function setDifferentDebtor($different_debtor)
     {
 
-        if (is_null($different_debitor)) {
-            throw new \InvalidArgumentException('non-nullable different_debitor cannot be null');
+        if (is_null($different_debtor)) {
+            throw new \InvalidArgumentException('non-nullable different_debtor cannot be null');
         }
 
-        $this->container['different_debitor'] = $different_debitor;
+        $this->container['different_debtor'] = $different_debtor;
 
         return $this;
     }
@@ -1707,6 +1372,35 @@ class Transaction implements ModelInterface, ArrayAccess, \JsonSerializable
         }
 
         $this->container['different_creditor'] = $different_creditor;
+
+        return $this;
+    }
+
+    /**
+     * Gets paypal_data
+     *
+     * @return \OpenAPIAccess\Client\Model\PendingTransactionPaypalData|null
+     */
+    public function getPaypalData()
+    {
+        return $this->container['paypal_data'];
+    }
+
+    /**
+     * Sets paypal_data
+     *
+     * @param \OpenAPIAccess\Client\Model\PendingTransactionPaypalData|null $paypal_data paypal_data
+     *
+     * @return self
+     */
+    public function setPaypalData($paypal_data)
+    {
+
+        if (is_null($paypal_data)) {
+            throw new \InvalidArgumentException('non-nullable paypal_data cannot be null');
+        }
+
+        $this->container['paypal_data'] = $paypal_data;
 
         return $this;
     }
